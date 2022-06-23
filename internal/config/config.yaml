@@ -1,0 +1,7 @@
+http:
+  port: 0504
+  timeout: 30
+
+routes:
+  gitlabRoutes:
+    - /gitlab/webhook
