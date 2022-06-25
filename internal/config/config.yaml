@@ -1,7 +1,11 @@
 http:
-  port: 0504
+  port: 9774
   timeout: 30
-
-routes:
-  gitlabRoutes:
-    - /gitlab/webhook
+handlers:
+- provider: gitlab
+  route: /gitlab/webhook
+  exporters:
+  - provider: telegram
+  templates:
+  - push: 'The test push message. User pushed: {{.user_name}}'
+  - build: 'The test build message. Build name: {{.build_name}}'

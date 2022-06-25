@@ -1,8 +1,10 @@
 package config
 
+import "time"
+
 type Configuration struct {
-	HTTP   HTTP
-	Routes Routes
+	Http     HTTP
+	Handlers []Handler
 }
 
 type HTTP struct {
@@ -10,6 +12,17 @@ type HTTP struct {
 	Timeout int
 }
 
-type Routes struct {
-	GitlabRoutes []string
+func (h *HTTP) GetTimeout() time.Duration {
+	return time.Duration(h.Timeout) * time.Second
+}
+
+type Handler struct {
+	Provider  string
+	Route     string
+	Exporters []Exporter
+	Templates map[string]string
+}
+
+type Exporter struct {
+	Provider string
 }

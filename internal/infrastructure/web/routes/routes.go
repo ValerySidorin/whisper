@@ -2,18 +2,19 @@ package routes
 
 import (
 	"github.com/ValerySidorin/whisper/internal/config"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/web/handlers"
+	handler "github.com/ValerySidorin/whisper/internal/infrastructure/web/handlers"
 	"github.com/fasthttp/router"
+	"github.com/valyala/fasthttp"
 )
 
-func ProvideRoutes(h *handlers.Handlers, cfg *config.Configuration) *router.Router {
-	return getDomainRouter(h, &cfg.Routes)
-}
-
-func getDomainRouter(h *handlers.Handlers, cfg *config.Routes) *router.Router {
+func Register(cfg config.Configuration) *router.Router {
 	r := router.New()
-	for _, v := range cfg.GitlabRoutes {
-		r.POST(v, h.DefaultHandler)
+	r.GET("/", func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.SetBodyString("Whisper is your CI event notifier")
+	})
+	for _, v := range cfg.Handlers {
+		h := handler.New(v)
+		r.POST(v.Route, h.DefaultHandlerFunc)
 	}
 	return r
 }
