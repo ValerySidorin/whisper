@@ -29,6 +29,8 @@ func (gmb *GitlabMessageBuilder) Build(event []byte, templates map[string]string
 		return "", err
 	}
 	buf := bytes.Buffer{}
-	t.Execute(&buf, &m)
+	if err := t.Execute(&buf, &m); err != nil {
+		return "", err
+	}
 	return buf.String(), nil
 }
