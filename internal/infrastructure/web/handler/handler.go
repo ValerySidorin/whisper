@@ -13,23 +13,14 @@ import (
 
 type Handler struct {
 	Provider  string
-	Exporters []exporters.Exporter
+	Exporters []config.Exporter
 	Templates map[string]string
 }
 
 func New(cfg config.Handler) (*Handler, error) {
-	exps := make([]exporters.Exporter, 0)
-	for _, v := range cfg.Exporters {
-		e, err := exporters.Get(&v)
-		if err != nil {
-			return nil, err
-		}
-		exps = append(exps, e)
-	}
-
 	return &Handler{
 		Provider:  cfg.Provider,
-		Exporters: exps,
+		Exporters: cfg.Exporters,
 		Templates: cfg.Templates,
 	}, nil
 }
@@ -45,8 +36,20 @@ func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {
 		h.processError(ctx, err)
 		return
 	}
+	for _, v := range h.Exporters {
+		e, err := exporters.Get(&v)
+		if err != nil {
+			h.processError(ctx, err)
+			return
+		}
+		for _, c := range v.Chats {
+			if err := e.SendMessage(m, c); err != nil {
+				h.processError(ctx, err)
+				return
+			}
+		}
+	}
 	ctx.Response.SetStatusCode(http.StatusOK)
-	ctx.Response.SetBodyString(m)
 }
 
 func (h *Handler) processError(ctx *fasthttp.RequestCtx, err error) {
