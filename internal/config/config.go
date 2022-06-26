@@ -26,5 +26,5 @@ type Handler struct {
 type Exporter struct {
 	Provider string
 	Token    string
-	Chats    []int64
+	ChatIds  []int64
 }

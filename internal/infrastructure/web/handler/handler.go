@@ -6,7 +6,7 @@ import (
 
 	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/exporters"
-	"github.com/ValerySidorin/whisper/internal/domain/messageBuilders"
+	"github.com/ValerySidorin/whisper/internal/domain/messagebuilders"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/valyala/fasthttp"
 )
@@ -26,7 +26,7 @@ func New(cfg config.Handler) (*Handler, error) {
 }
 
 func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {
-	mb, err := messageBuilders.Get(h.Provider)
+	mb, err := messagebuilders.Get(h.Provider)
 	if err != nil {
 		h.processError(ctx, err)
 		return
@@ -42,8 +42,8 @@ func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {
 			h.processError(ctx, err)
 			return
 		}
-		for _, c := range v.Chats {
-			if err := e.SendMessage(m, c); err != nil {
+		for _, chatID := range v.ChatIds {
+			if err := e.SendMessage(m, chatID); err != nil {
 				h.processError(ctx, err)
 				return
 			}

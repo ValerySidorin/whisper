@@ -1,4 +1,4 @@
-package messageBuilders
+package messagebuilders
 
 import (
 	"bytes"

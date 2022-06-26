@@ -7,7 +7,7 @@ handlers:
   exporters:
   - provider: telegram
     token: 5577541047:AAGeDDYUK73aWNCT2e91xJpULVx6wbhSxuA
-    chats:
+    chatIds:
     - -543537020
   templates:
   - push: 'The test push message. User pushed: {{.user_name}}'
