@@ -21,19 +21,17 @@ func NewExporter(cfg *config.Exporter) (*TelegramExporter, error) {
 	if !ok {
 		return nil, errors.New("telegram chat IDs not present")
 	}
-
-	IDs := make([]int, 0)
+	intIDs := make([]int, 0)
 	for _, v := range chatIDs.([]interface{}) {
-		IDs = append(IDs, v.(int))
+		intIDs = append(intIDs, v.(int))
 	}
-
 	bot, err := tgbotapi.NewBotAPI(token.(string))
 	if err != nil {
 		return nil, err
 	}
 	return &TelegramExporter{
 		Bot:     bot,
-		ChatIDs: IDs,
+		ChatIDs: intIDs,
 	}, nil
 }
 
