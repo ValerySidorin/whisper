@@ -19,12 +19,11 @@ func (h *HTTP) GetTimeout() time.Duration {
 type Handler struct {
 	Provider  string
 	Route     string
+	Action    string
 	Exporters []Exporter
-	Templates map[string]string
 }
 
 type Exporter struct {
-	Provider string
-	Token    string
-	Chats    []int64
+	Provider   string
+	Attributes map[string]interface{}
 }
