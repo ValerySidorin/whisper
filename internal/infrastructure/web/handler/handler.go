@@ -5,48 +5,42 @@ import (
 	"net/http"
 
 	"github.com/ValerySidorin/whisper/internal/config"
-	"github.com/ValerySidorin/whisper/internal/domain/exporters"
-	"github.com/ValerySidorin/whisper/internal/domain/messageBuilders"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
 	"github.com/valyala/fasthttp"
 )
 
 type Handler struct {
 	Provider  string
-	Exporters []exporters.Exporter
-	Templates map[string]string
+	Exporters []config.Exporter
 }
 
 func New(cfg config.Handler) (*Handler, error) {
-	exps := make([]exporters.Exporter, 0)
-	for _, v := range cfg.Exporters {
-		e, err := exporters.Get(&v)
-		if err != nil {
-			return nil, err
-		}
-		exps = append(exps, e)
-	}
-
 	return &Handler{
 		Provider:  cfg.Provider,
-		Exporters: exps,
-		Templates: cfg.Templates,
+		Exporters: cfg.Exporters,
 	}, nil
 }
 
 func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {
-	mb, err := messageBuilders.Get(h.Provider)
+	m, err := vcshosting.GetMessageable(h.Provider, string(ctx.Request.Body()))
 	if err != nil {
 		h.processError(ctx, err)
 		return
 	}
-	m, err := mb.Build(ctx.Request.Body(), h.Templates)
-	if err != nil {
-		h.processError(ctx, err)
-		return
+	for _, v := range h.Exporters {
+		e, err := messenger.GetExporter(&v)
+		if err != nil {
+			h.processError(ctx, err)
+			return
+		}
+		if err := e.SendMessage(m.GetMessage()); err != nil {
+			h.processError(ctx, err)
+			return
+		}
 	}
 	ctx.Response.SetStatusCode(http.StatusOK)
-	ctx.Response.SetBodyString(m)
 }
 
 func (h *Handler) processError(ctx *fasthttp.RequestCtx, err error) {
