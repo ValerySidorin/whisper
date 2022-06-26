@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain/exporters"
 	"github.com/ValerySidorin/whisper/internal/domain/messageBuilders"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/valyala/fasthttp"
@@ -12,16 +13,25 @@ import (
 
 type Handler struct {
 	Provider  string
-	Exporters []config.Exporter
+	Exporters []exporters.Exporter
 	Templates map[string]string
 }
 
-func New(cfg config.Handler) *Handler {
+func New(cfg config.Handler) (*Handler, error) {
+	exps := make([]exporters.Exporter, 0)
+	for _, v := range cfg.Exporters {
+		e, err := exporters.Get(&v)
+		if err != nil {
+			return nil, err
+		}
+		exps = append(exps, e)
+	}
+
 	return &Handler{
 		Provider:  cfg.Provider,
-		Exporters: cfg.Exporters,
+		Exporters: exps,
 		Templates: cfg.Templates,
-	}
+	}, nil
 }
 
 func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {

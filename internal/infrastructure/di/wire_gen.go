@@ -18,7 +18,10 @@ import (
 func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
-	router := routes.Register(configuration)
+	router, err := routes.Register(configuration)
+	if err != nil {
+		return nil, err
+	}
 	server := web.Register(coreContext, router, configuration)
 	return server, nil
 }
