@@ -5,6 +5,7 @@ import "fmt"
 type Deployment struct {
 	ID            int64   `json:"id"`
 	Status        string  `json:"status"`
+	Job           Job     `json:"job"`
 	DeployableURL string  `json:"deployable_url"`
 	Environment   string  `json:"environment"`
 	Project       Project `json:"project"`
@@ -15,9 +16,11 @@ type Deployment struct {
 
 func (d *Deployment) GetMessage() string {
 	switch d.Status {
+	case "running":
+		return fmt.Sprintf("A new deployment is running! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\nJob: %v\n %v\n-- -- -- --\nCommit: %v\n%v\n-- -- -- --\nInitiator: %v", d.Project.Name, d.Environment, d.Job.Name, d.DeployableURL, d.CommitTitle, d.CommitURL, d.User.Name)
 	case "success":
-		return fmt.Sprintf("Произошел успешный Deploy! | %v\n\nОкружение: %v\n\nЗадача: %v\n\nКоммит: %v\n%v\n\nИнициатор: %v", d.Project.Name, d.Environment, d.DeployableURL, d.CommitTitle, d.CommitURL, d.User.Name)
+		return fmt.Sprintf("Deployment succeded! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\nJob: %v\n-- -- -- --\nCommit: %v\n%v\n-- -- -- --\nInitiator: %v", d.Project.Name, d.Environment, d.Job.Name, d.CommitTitle, d.CommitURL, d.User.Name)
 	default:
-		return fmt.Sprintf("Изменение статуса Deploy! | %v\n\nОкружение: %v\n\n→ %v\n\nЗадача: %v", d.Project.Name, d.Environment, d.Status, d.DeployableURL)
+		return fmt.Sprintf("Deployment status changed! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\n→ %v\n-- -- -- --\nJob: %v\n%v", d.Project.Name, d.Environment, d.Status, d.Job.Name, d.DeployableURL)
 	}
 }

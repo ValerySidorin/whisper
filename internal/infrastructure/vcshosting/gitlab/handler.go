@@ -3,35 +3,77 @@ package gitlab
 import (
 	"encoding/json"
 
-	"github.com/ValerySidorin/whisper/internal/domain/dto"
+	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/converters"
-	gitlabdto "github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/dto"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 type GitlabHandler struct {
 	Exporters []port.Exporter
+	Client    *gitlab.Client
 }
 
-func (gh *GitlabHandler) HandleMergeRequest(body []byte) (*dto.MergeRequest, error) {
-	gmr := gitlabdto.MergeRequest{}
-	if err := json.Unmarshal(body, &gmr); err != nil {
-		return nil, err
-	}
-	converter := converters.MRConverter{MergeRequest: &gmr}
-	m, err := converter.Convert()
-	mr := m.(*dto.MergeRequest)
+func NewHandler(cfg *config.Handler) (*GitlabHandler, error) {
+	opts, err := NewGitlabOptions(cfg.VCSHosting.Options)
 	if err != nil {
 		return nil, err
 	}
-	for _, e := range gh.Exporters {
-		if err := e.SendMessage(mr.GetMessage()); err != nil {
+	c, err := gitlab.NewClient(opts.Token, gitlab.WithBaseURL(opts.URL))
+	exporters := make([]port.Exporter, 0)
+	for _, v := range cfg.Exporters {
+		e, err := messenger.GetExporter(&v)
+		if err != nil {
 			return nil, err
 		}
+		exporters = append(exporters, e)
 	}
-	return mr, nil
+	if err != nil {
+		return nil, err
+	}
+	return &GitlabHandler{
+		Client:    c,
+		Exporters: exporters,
+	}, nil
 }
 
-func (gh *GitlabHandler) HandleDeployment(body []byte) (*dto.Deployment, error) {
-	return nil, nil
+func (gh *GitlabHandler) HandleMergeRequest(body []byte) error {
+	gmr := gitlab.MergeEvent{}
+	if err := json.Unmarshal(body, &gmr); err != nil {
+		return err
+	}
+	conv := converters.MRConverter{MergeEvent: &gmr}
+	m, err := conv.Convert()
+	if err != nil {
+		return err
+	}
+	for _, e := range gh.Exporters {
+		if err := e.SendMessage(m.GetMessage()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (gh *GitlabHandler) HandleDeployment(body []byte) error {
+	gd := gitlab.DeploymentEvent{}
+	if err := json.Unmarshal(body, &gd); err != nil {
+		return err
+	}
+	j, _, err := gh.Client.Jobs.GetJob(gd.Project.ID, gd.DeployableID)
+	if err != nil {
+		return err
+	}
+	conv := converters.DeploymentConverter{DeploymentEvent: &gd, Job: j}
+	m, err := conv.Convert()
+	if err != nil {
+		return err
+	}
+	for _, e := range gh.Exporters {
+		if err := e.SendMessage(m.GetMessage()); err != nil {
+			return err
+		}
+	}
+	return nil
 }

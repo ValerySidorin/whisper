@@ -1,7 +1,5 @@
 package port
 
-import "github.com/ValerySidorin/whisper/internal/domain/dto"
-
 type HttpError interface {
 	error
 	GetCode() int
@@ -9,6 +7,6 @@ type HttpError interface {
 }
 
 type VCSHostingHandler interface {
-	HandleMergeRequest(body []byte) (*dto.MergeRequest, error)
-	HandleDeployment(body []byte) (*dto.Deployment, error)
+	HandleMergeRequest(body []byte) error
+	HandleDeployment(body []byte) error
 }

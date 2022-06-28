@@ -3,35 +3,40 @@ package converters
 import (
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
-	gitlab "github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/dto"
+	"github.com/xanzy/go-gitlab"
 )
 
 type DeploymentConverter struct {
-	Deployment *gitlab.Deployment
+	DeploymentEvent *gitlab.DeploymentEvent
+	Job             *gitlab.Job
 }
 
-func NewDeploymentConverter(d *gitlab.Deployment) DeploymentConverter {
+func NewDeploymentConverter(d *gitlab.DeploymentEvent, j *gitlab.Job) DeploymentConverter {
 	return DeploymentConverter{
-		Deployment: d,
+		DeploymentEvent: d,
+		Job:             j,
 	}
 }
 
 func (c *DeploymentConverter) Convert() (port.Messageable, error) {
 	return &dto.Deployment{
-		ID:            c.Deployment.DeploymentID,
-		Status:        c.Deployment.Status,
-		DeployableURL: c.Deployment.DeployableURL,
-		Environment:   c.Deployment.Environment,
+		Status: c.DeploymentEvent.Status,
+		Job: dto.Job{
+			ID:   int64(c.Job.ID),
+			Name: c.Job.Name,
+		},
+		DeployableURL: c.DeploymentEvent.DeployableURL,
+		Environment:   c.DeploymentEvent.Environment,
 		Project: dto.Project{
-			ID:          c.Deployment.Project.ID,
-			Name:        c.Deployment.Project.Name,
-			Description: c.Deployment.Project.Description,
+			ID:          int64(c.DeploymentEvent.Project.ID),
+			Name:        c.DeploymentEvent.Project.Name,
+			Description: c.DeploymentEvent.Project.Description,
 		},
 		User: dto.Person{
-			Name:     c.Deployment.User.Name,
-			UserName: c.Deployment.User.Username,
+			Name:     c.DeploymentEvent.User.Name,
+			UserName: c.DeploymentEvent.User.Username,
 		},
-		CommitURL:   c.Deployment.CommitURL,
-		CommitTitle: c.Deployment.CommitTitle,
+		CommitURL:   c.DeploymentEvent.CommitURL,
+		CommitTitle: c.DeploymentEvent.CommitTitle,
 	}, nil
 }

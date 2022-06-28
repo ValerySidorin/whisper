@@ -6,8 +6,7 @@ import (
 
 	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
 	"github.com/valyala/fasthttp"
 )
 
@@ -16,27 +15,17 @@ type Handler struct {
 }
 
 func New(cfg *config.Handler) (*Handler, error) {
-	exporters := make([]port.Exporter, 0)
-	for _, v := range cfg.Exporters {
-		e, err := messenger.GetExporter(&v)
-		if err != nil {
-			return nil, err
-		}
-		exporters = append(exporters, e)
+	handler := &Handler{}
+	h, err := vcshosting.GetVCSHostingHandler(cfg)
+	if err != nil {
+		return nil, err
 	}
-	h := &Handler{}
-	switch cfg.Provider {
-	case "gitlab":
-		h.Handler = &gitlab.GitlabHandler{
-			Exporters: exporters,
-		}
-	}
-	return h, nil
+	handler.Handler = h
+	return handler, nil
 }
 
 func (h *Handler) MergeRequestHandlerFunc(ctx *fasthttp.RequestCtx) {
-	_, err := h.Handler.HandleMergeRequest(ctx.Request.Body())
-	if err != nil {
+	if err := h.Handler.HandleMergeRequest(ctx.Request.Body()); err != nil {
 		h.processError(ctx, err)
 		return
 	}
@@ -44,8 +33,7 @@ func (h *Handler) MergeRequestHandlerFunc(ctx *fasthttp.RequestCtx) {
 }
 
 func (h *Handler) DeploymentHandlerFunc(ctx *fasthttp.RequestCtx) {
-	_, err := h.Handler.HandleDeployment(ctx.Request.Body())
-	if err != nil {
+	if err := h.Handler.HandleDeployment(ctx.Request.Body()); err != nil {
 		h.processError(ctx, err)
 		return
 	}
