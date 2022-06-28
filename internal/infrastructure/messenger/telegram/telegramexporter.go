@@ -1,8 +1,6 @@
 package telegram
 
 import (
-	"errors"
-
 	"github.com/ValerySidorin/whisper/internal/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -13,25 +11,17 @@ type TelegramExporter struct {
 }
 
 func NewExporter(cfg *config.Exporter) (*TelegramExporter, error) {
-	token, ok := cfg.Attributes["token"]
-	if !ok {
-		return nil, errors.New("telegram token is not present")
+	opts, err := NewTelegramOptions(cfg.Options)
+	if err != nil {
+		return nil, err
 	}
-	chatIDs, ok := cfg.Attributes["chatIds"]
-	if !ok {
-		return nil, errors.New("telegram chat IDs not present")
-	}
-	intIDs := make([]int, 0)
-	for _, v := range chatIDs.([]interface{}) {
-		intIDs = append(intIDs, v.(int))
-	}
-	bot, err := tgbotapi.NewBotAPI(token.(string))
+	bot, err := tgbotapi.NewBotAPI(opts.Token)
 	if err != nil {
 		return nil, err
 	}
 	return &TelegramExporter{
 		Bot:     bot,
-		ChatIDs: intIDs,
+		ChatIDs: opts.ChatIDs,
 	}, nil
 }
 

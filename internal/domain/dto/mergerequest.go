@@ -2,18 +2,15 @@ package dto
 
 import (
 	"fmt"
-	"time"
 )
 
 type MergeRequest struct {
 	ID           int64
 	IID          int64
-	ProjectID    int64
+	Project      Project
 	Title        string
 	Description  string
 	State        string
-	CreatedDate  time.Time
-	UpdatedDate  time.Time
 	URL          string
 	Author       Person
 	Assignee     Person
@@ -23,5 +20,14 @@ type MergeRequest struct {
 }
 
 func (mr *MergeRequest) GetMessage() string {
-	return fmt.Sprintf("Your typical merge request message. Title: %v", mr.Title)
+	switch mr.State {
+	case "opened":
+		return fmt.Sprintf("New Merge Request! | %v\n-- -- -- --\nTitle: %v\nDescription: %v\n%v\n-- -- -- --\nBranch: %v → %v\nAuthor: %v",
+			mr.Project.Name, mr.Title, mr.Description, mr.URL, mr.SourceBranch, mr.TargetBranch, mr.Author.Name)
+	case "merged":
+		return fmt.Sprintf("Merge Request has been merged! | %v\n-- -- -- --\nTitle: %v\nDescription: %v\n%v\n-- -- -- --\nBranch: %v → %v\nAuthor: %v",
+			mr.Project.Name, mr.Title, mr.Description, mr.URL, mr.SourceBranch, mr.TargetBranch, mr.Author.Name)
+	default:
+		return fmt.Sprintf("Merge Request status changed! | %v\n-- -- -- --\n→ %v", mr.Project.Name, mr.State)
+	}
 }

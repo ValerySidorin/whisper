@@ -17,13 +17,18 @@ func (h *HTTP) GetTimeout() time.Duration {
 }
 
 type Handler struct {
-	Provider  string
-	Route     string
-	Action    string
-	Exporters []Exporter
+	VCSHosting VCSHosting
+	Route      string
+	Action     string
+	Exporters  []Exporter
 }
 
 type Exporter struct {
-	Provider   string
-	Attributes map[string]interface{}
+	Provider string
+	Options  map[string]interface{}
+}
+
+type VCSHosting struct {
+	Provider string
+	Options  map[string]interface{}
 }
