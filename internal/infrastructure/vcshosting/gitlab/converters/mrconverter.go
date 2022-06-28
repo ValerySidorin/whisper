@@ -3,44 +3,50 @@ package converters
 import (
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
-	gitlab "github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/dto"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 type MRConverter struct {
-	MergeRequest *gitlab.MergeRequest
+	MergeEvent *gitlab.MergeEvent
 }
 
-func NewMRConverter(mr *gitlab.MergeRequest) MRConverter {
+func NewMRConverter(mr *gitlab.MergeEvent) MRConverter {
 	return MRConverter{
-		MergeRequest: mr,
+		MergeEvent: mr,
 	}
 }
 
 func (c *MRConverter) Convert() (port.Messageable, error) {
 	labels := make([]string, 0)
-	for _, l := range c.MergeRequest.ObjectAttributes.Changes.Labels {
-		labels = append(labels, l.Title)
+	for _, l := range c.MergeEvent.Labels {
+		labels = append(labels, l.Name)
+	}
+	var assignee dto.Person
+	if c.MergeEvent.Assignee != nil {
+		assignee = dto.Person{
+			Name:     c.MergeEvent.Assignee.Name,
+			UserName: c.MergeEvent.User.Username,
+		}
 	}
 	return &dto.MergeRequest{
-		ID:          c.MergeRequest.ObjectAttributes.ID,
-		IID:         c.MergeRequest.ObjectAttributes.IID,
-		ProjectID:   c.MergeRequest.Project.ID,
-		Title:       c.MergeRequest.ObjectAttributes.Title,
-		Description: c.MergeRequest.ObjectAttributes.Description,
-		State:       c.MergeRequest.ObjectAttributes.State,
-		CreatedDate: c.MergeRequest.ObjectAttributes.CreatedAt,
-		UpdatedDate: c.MergeRequest.ObjectAttributes.UpdatedAt,
-		URL:         c.MergeRequest.ObjectAttributes.URL,
+		ID:  int64(c.MergeEvent.ObjectAttributes.ID),
+		IID: int64(c.MergeEvent.ObjectAttributes.IID),
+		Project: dto.Project{
+			ID:          int64(c.MergeEvent.Project.ID),
+			Name:        c.MergeEvent.Project.Name,
+			Description: c.MergeEvent.Project.Description,
+		},
+		Title:       c.MergeEvent.ObjectAttributes.Title,
+		Description: c.MergeEvent.ObjectAttributes.Description,
+		State:       c.MergeEvent.ObjectAttributes.State,
+		URL:         c.MergeEvent.ObjectAttributes.URL,
 		Author: dto.Person{
-			Name:     c.MergeRequest.User.Name,
-			UserName: c.MergeRequest.User.Username,
+			Name:     c.MergeEvent.User.Name,
+			UserName: c.MergeEvent.User.Username,
 		},
-		Assignee: dto.Person{
-			Name:     c.MergeRequest.ObjectAttributes.Assignee.Name,
-			UserName: c.MergeRequest.ObjectAttributes.Assignee.Username,
-		},
-		SourceBranch: c.MergeRequest.ObjectAttributes.SourceBranch,
-		TargetBranch: c.MergeRequest.ObjectAttributes.TargetBranch,
+		Assignee:     assignee,
+		SourceBranch: c.MergeEvent.ObjectAttributes.SourceBranch,
+		TargetBranch: c.MergeEvent.ObjectAttributes.TargetBranch,
 		Labels:       labels,
 	}, nil
 }

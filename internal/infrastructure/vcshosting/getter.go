@@ -1,39 +1,18 @@
 package vcshosting
 
 import (
-	"encoding/json"
-	"fmt"
+	"errors"
 
+	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
-	gitlabconv "github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/converters"
-	gitlabdto "github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/dto"
-	"github.com/tidwall/gjson"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 )
 
-func GetMessageable(provider string, j string) (port.Messageable, error) {
-	switch provider {
+func GetVCSHostingHandler(cfg *config.Handler) (port.VCSHostingHandler, error) {
+	switch cfg.VCSHosting.Provider {
 	case "gitlab":
-		objKind := gjson.Get(j, "object_kind").String()
-		return GetMessageableFromGitlabDto(objKind, j)
+		return gitlab.NewHandler(cfg)
 	default:
-		return nil, fmt.Errorf("unknown event provider: %v", provider)
-	}
-}
-
-func GetMessageableFromGitlabDto(objKind string, j string) (port.Messageable, error) {
-	switch objKind {
-	case "merge_request":
-		mr := gitlabdto.MergeRequest{}
-		if err := json.Unmarshal([]byte(j), &mr); err != nil {
-			return nil, err
-		}
-		conv := gitlabconv.NewMRConverter(&mr)
-		res, err := conv.Convert()
-		if err != nil {
-			return nil, err
-		}
-		return res, nil
-	default:
-		return nil, fmt.Errorf("unknown object kind: %v", objKind)
+		return nil, errors.New("unknown vcshosting")
 	}
 }
