@@ -33,6 +33,17 @@ func GetMessageableFromGitlabDto(objKind string, j string) (port.Messageable, er
 			return nil, err
 		}
 		return res, nil
+	case "deployment":
+		d := gitlabdto.Deployment{}
+		if err := json.Unmarshal([]byte(j), &d); err != nil {
+			return nil, err
+		}
+		conv := gitlabconv.NewDeploymentConverter(&d)
+		res, err := conv.Convert()
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
 	default:
 		return nil, fmt.Errorf("unknown object kind: %v", objKind)
 	}

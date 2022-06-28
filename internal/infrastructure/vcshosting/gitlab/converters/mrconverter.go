@@ -22,9 +22,13 @@ func (c *MRConverter) Convert() (port.Messageable, error) {
 		labels = append(labels, l.Title)
 	}
 	return &dto.MergeRequest{
-		ID:          c.MergeRequest.ObjectAttributes.ID,
-		IID:         c.MergeRequest.ObjectAttributes.IID,
-		ProjectID:   c.MergeRequest.Project.ID,
+		ID:  c.MergeRequest.ObjectAttributes.ID,
+		IID: c.MergeRequest.ObjectAttributes.IID,
+		Project: dto.Project{
+			ID:          c.MergeRequest.Project.ID,
+			Name:        c.MergeRequest.Project.Name,
+			Description: c.MergeRequest.Project.Description,
+		},
 		Title:       c.MergeRequest.ObjectAttributes.Title,
 		Description: c.MergeRequest.ObjectAttributes.Description,
 		State:       c.MergeRequest.ObjectAttributes.State,

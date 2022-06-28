@@ -7,38 +7,47 @@ import (
 	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 	"github.com/valyala/fasthttp"
 )
 
 type Handler struct {
-	Provider  string
-	Exporters []config.Exporter
+	Handler port.VCSHostingHandler
 }
 
-func New(cfg config.Handler) (*Handler, error) {
-	return &Handler{
-		Provider:  cfg.Provider,
-		Exporters: cfg.Exporters,
-	}, nil
+func New(cfg *config.Handler) (*Handler, error) {
+	exporters := make([]port.Exporter, 0)
+	for _, v := range cfg.Exporters {
+		e, err := messenger.GetExporter(&v)
+		if err != nil {
+			return nil, err
+		}
+		exporters = append(exporters, e)
+	}
+	h := &Handler{}
+	switch cfg.Provider {
+	case "gitlab":
+		h.Handler = &gitlab.GitlabHandler{
+			Exporters: exporters,
+		}
+	}
+	return h, nil
 }
 
-func (h *Handler) DefaultHandlerFunc(ctx *fasthttp.RequestCtx) {
-	m, err := vcshosting.GetMessageable(h.Provider, string(ctx.Request.Body()))
+func (h *Handler) MergeRequestHandlerFunc(ctx *fasthttp.RequestCtx) {
+	_, err := h.Handler.HandleMergeRequest(ctx.Request.Body())
 	if err != nil {
 		h.processError(ctx, err)
 		return
 	}
-	for _, v := range h.Exporters {
-		e, err := messenger.GetExporter(&v)
-		if err != nil {
-			h.processError(ctx, err)
-			return
-		}
-		if err := e.SendMessage(m.GetMessage()); err != nil {
-			h.processError(ctx, err)
-			return
-		}
+	ctx.Response.SetStatusCode(http.StatusOK)
+}
+
+func (h *Handler) DeploymentHandlerFunc(ctx *fasthttp.RequestCtx) {
+	_, err := h.Handler.HandleDeployment(ctx.Request.Body())
+	if err != nil {
+		h.processError(ctx, err)
+		return
 	}
 	ctx.Response.SetStatusCode(http.StatusOK)
 }
@@ -50,12 +59,12 @@ func (h *Handler) processError(ctx *fasthttp.RequestCtx, err error) {
 		code, msg := apiErr.GetCode(), apiErr.Error()
 		ctx.SetStatusCode(code)
 		if code >= http.StatusInternalServerError {
-			ctx.Response.SetBodyString("Internal server error")
+			ctx.Response.SetBodyString(apiErr.Error())
 		} else {
 			ctx.SetBodyString(msg)
 		}
 	} else {
 		ctx.SetStatusCode(http.StatusInternalServerError)
-		ctx.Response.SetBodyString("Internal server error")
+		ctx.Response.SetBodyString(apiErr.Error())
 	}
 }

@@ -3,11 +3,11 @@ http:
   timeout: 30
 handlers:
 - provider: gitlab
-  route: "/gitlab/merge-request"
+  route: /gitlab/merge-request
   action: merge_request
   exporters:
   - provider: telegram
     attributes:
       token: 5577541047:AAGeDDYUK73aWNCT2e91xJpULVx6wbhSxuA
       chatIds:
-      - -543537020
+      - 877240015
