@@ -5,8 +5,3 @@ type HttpError interface {
 	GetCode() int
 	GetErr() error
 }
-
-type VCSHostingHandler interface {
-	HandleMergeRequest(body []byte) error
-	HandleDeployment(body []byte) error
-}

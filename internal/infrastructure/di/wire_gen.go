@@ -8,6 +8,7 @@ package di
 
 import (
 	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
@@ -18,7 +19,8 @@ import (
 func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
-	router, err := routes.Register(configuration)
+	defaultMessageRenderer := domain.RegisterDefaultMessageRenderer()
+	router, err := routes.Register(configuration, defaultMessageRenderer)
 	if err != nil {
 		return nil, err
 	}
