@@ -30,12 +30,9 @@ func (mr *MergeRequest) GetMessage() string {
 
 	switch mr.State {
 	case "opened":
-		return fmt.Sprintf("New Merge Request! | %v\n-- -- -- --\nTitle: %v\nDescription: %v\n%v\n-- -- -- --\nBranch: %v → %v\nAuthor: %v",
-			mr.Project.Name, mr.Title, mr.Description, mr.URL, mr.SourceBranch, mr.TargetBranch, mr.Author.Name)
-	case "merged":
-		return fmt.Sprintf("Merge Request has been merged! | %v\n-- -- -- --\nTitle: %v\nDescription: %v\n%v\n-- -- -- --\nTracker: %v\n-- -- -- --\nBranch: %v → %v\nAuthor: %v",
+		return fmt.Sprintf("New Merge Request! | %v\n-- -- -- --\nTitle: %v\nDescription: %v\n%v\n-- -- -- --\nTracker: %v\n-- -- -- --\nBranch: %v → %v\nAuthor: %v",
 			mr.Project.Name, mr.Title, mr.Description, mr.URL, trackerLink, mr.SourceBranch, mr.TargetBranch, mr.Author.Name)
 	default:
-		return fmt.Sprintf("Merge Request status changed! | %v\n-- -- -- --\n→ %v", mr.Project.Name, mr.State)
+		return ""
 	}
 }

@@ -48,9 +48,12 @@ func (gh *GitlabHandler) HandleMergeRequest(body []byte) error {
 	if err != nil {
 		return err
 	}
-	for _, e := range gh.Exporters {
-		if err := e.SendMessage(m.GetMessage()); err != nil {
-			return err
+	msg := m.GetMessage()
+	if msg != "" {
+		for _, e := range gh.Exporters {
+			if err := e.SendMessage(msg); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -70,9 +73,12 @@ func (gh *GitlabHandler) HandleDeployment(body []byte) error {
 	if err != nil {
 		return err
 	}
-	for _, e := range gh.Exporters {
-		if err := e.SendMessage(m.GetMessage()); err != nil {
-			return err
+	msg := m.GetMessage()
+	if msg != "" {
+		for _, e := range gh.Exporters {
+			if err := e.SendMessage(msg); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
