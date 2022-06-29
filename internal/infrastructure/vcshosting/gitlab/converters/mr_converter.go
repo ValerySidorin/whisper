@@ -2,7 +2,6 @@ package converters
 
 import (
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
-	"github.com/ValerySidorin/whisper/internal/domain/port"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -16,7 +15,7 @@ func NewMRConverter(mr *gitlab.MergeEvent) MRConverter {
 	}
 }
 
-func (c *MRConverter) Convert() (port.Messageable, error) {
+func (c *MRConverter) Convert() (interface{}, error) {
 	labels := make([]string, 0)
 	for _, l := range c.MergeEvent.Labels {
 		labels = append(labels, l.Name)

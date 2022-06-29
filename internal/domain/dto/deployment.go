@@ -16,11 +16,11 @@ type Deployment struct {
 
 func (d *Deployment) GetMessage() string {
 	switch d.Status {
-	case "running":
-		return fmt.Sprintf("A new deployment is running! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\nJob: %v\n %v\n-- -- -- --\nCommit: %v\n%v\n-- -- -- --\nInitiator: %v", d.Project.Name, d.Environment, d.Job.Name, d.DeployableURL, d.CommitTitle, d.CommitURL, d.User.Name)
 	case "success":
 		return fmt.Sprintf("Deployment succeded! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\nJob: %v\n-- -- -- --\nCommit: %v\n%v\n-- -- -- --\nInitiator: %v", d.Project.Name, d.Environment, d.Job.Name, d.CommitTitle, d.CommitURL, d.User.Name)
+	case "failed":
+		return fmt.Sprintf("Deployment failed! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\n→ %v\n-- -- -- --\nJob: %v\n%v", d.Project.Name, d.Environment, d.Status, d.Job.Name, d.DeployableURL)
 	default:
-		return fmt.Sprintf("Deployment status changed! | %v\n-- -- -- --\nEnv: %v\n-- -- -- --\n→ %v\n-- -- -- --\nJob: %v\n%v", d.Project.Name, d.Environment, d.Status, d.Job.Name, d.DeployableURL)
+		return ""
 	}
 }
