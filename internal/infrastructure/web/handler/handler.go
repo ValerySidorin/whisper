@@ -5,37 +5,46 @@ import (
 	"net/http"
 
 	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
 	"github.com/valyala/fasthttp"
 )
 
 type Handler struct {
-	Handler port.VCSHostingHandler
+	eventHandler *domain.EventHandler
 }
 
 func New(cfg *config.Handler) (*Handler, error) {
-	handler := &Handler{}
-	h, err := vcshosting.GetVCSHostingHandler(cfg)
+	exporters := make([]port.Exporter, 0)
+	for _, v := range cfg.Exporters {
+		e, err := messenger.GetExporter(&v)
+		if err != nil {
+			return nil, err
+		}
+		exporters = append(exporters, e)
+	}
+	p, err := vcshosting.GetEventParser(cfg)
 	if err != nil {
 		return nil, err
 	}
-	handler.Handler = h
-	return handler, nil
+	eh := domain.NewEventHandler(exporters, p)
+	h := &Handler{}
+	h.eventHandler = eh
+	return h, nil
 }
 
 func (h *Handler) MergeRequestHandlerFunc(ctx *fasthttp.RequestCtx) {
-	if err := h.Handler.HandleMergeRequest(ctx.Request.Body()); err != nil {
+	if err := h.eventHandler.HandleMergeRequest(ctx.Request.Body()); err != nil {
 		h.processError(ctx, err)
-		return
 	}
 	ctx.Response.SetStatusCode(http.StatusOK)
 }
 
 func (h *Handler) DeploymentHandlerFunc(ctx *fasthttp.RequestCtx) {
-	if err := h.Handler.HandleDeployment(ctx.Request.Body()); err != nil {
+	if err := h.eventHandler.HandleDeployment(ctx.Request.Body()); err != nil {
 		h.processError(ctx, err)
-		return
 	}
 	ctx.Response.SetStatusCode(http.StatusOK)
 }
