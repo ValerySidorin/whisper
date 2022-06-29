@@ -1,5 +1,5 @@
 package port
 
 type Converter interface {
-	Convert() (Messageable, error)
+	Convert() (interface{}, error)
 }

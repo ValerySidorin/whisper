@@ -23,7 +23,12 @@ func (h *EventHandler) HandleMergeRequest(body []byte) error {
 	if err != nil {
 		return err
 	}
-	return h.sendEvent(e)
+	for _, v := range h.exporters {
+		if err := v.SendMergeRequest(e); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (h *EventHandler) HandleDeployment(body []byte) error {
@@ -31,16 +36,9 @@ func (h *EventHandler) HandleDeployment(body []byte) error {
 	if err != nil {
 		return err
 	}
-	return h.sendEvent(e)
-}
-
-func (h *EventHandler) sendEvent(m port.Messageable) error {
-	msg := m.GetMessage()
-	if msg != "" {
-		for _, v := range h.exporters {
-			if err := v.SendMessage(msg); err != nil {
-				return err
-			}
+	for _, v := range h.exporters {
+		if err := v.SendDeployment(e); err != nil {
+			return err
 		}
 	}
 	return nil

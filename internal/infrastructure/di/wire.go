@@ -5,6 +5,8 @@ package di
 
 import (
 	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain"
+	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
@@ -13,12 +15,13 @@ import (
 
 func InitWebServer() (*web.Server, error) {
 	wire.Build(
-		//wire.Bind(new(port.ContextProvider), new(*appctx.CoreContext)),
+		wire.Bind(new(port.MessageRenderer), new(*domain.DefaultMessageRenderer)),
 
 		routes.Register,
 		web.Register,
 		appctx.Register,
 		config.Register,
+		domain.RegisterDefaultMessageRenderer,
 	)
 	return &web.Server{}, nil
 }

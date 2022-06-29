@@ -2,7 +2,6 @@ package converters
 
 import (
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
-	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -18,7 +17,7 @@ func NewDeploymentConverter(d *gitlab.DeploymentEvent, j *gitlab.Job) Deployment
 	}
 }
 
-func (c *DeploymentConverter) Convert() (port.Messageable, error) {
+func (c *DeploymentConverter) Convert() (interface{}, error) {
 	return &dto.Deployment{
 		Status: c.DeploymentEvent.Status,
 		Job: dto.Job{

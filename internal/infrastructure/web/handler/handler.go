@@ -16,10 +16,10 @@ type Handler struct {
 	eventHandler *domain.EventHandler
 }
 
-func New(cfg *config.Handler) (*Handler, error) {
+func New(cfg *config.Handler, r port.MessageRenderer) (*Handler, error) {
 	exporters := make([]port.Exporter, 0)
 	for _, v := range cfg.Exporters {
-		e, err := messenger.GetExporter(&v)
+		e, err := messenger.GetExporter(&v, r)
 		if err != nil {
 			return nil, err
 		}

@@ -2,16 +2,17 @@ package routes
 
 import (
 	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/handler"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
-func Register(cfg config.Configuration) (*router.Router, error) {
+func Register(cfg config.Configuration, rndr port.MessageRenderer) (*router.Router, error) {
 	r := router.New()
 	r.GET("/", DefaultHandlerFunc)
 	for _, v := range cfg.Handlers {
-		h, err := handler.New(&v)
+		h, err := handler.New(&v, rndr)
 		if err != nil {
 			return nil, err
 		}
