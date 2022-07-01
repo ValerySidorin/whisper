@@ -1,6 +1,6 @@
 package port
 
-import "github.com/ValerySidorin/whisper/internal/domain/dto"
+import dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 
 type EventParser interface {
 	ParseMergeRequest(body []byte) (*dto.MergeRequest, error)

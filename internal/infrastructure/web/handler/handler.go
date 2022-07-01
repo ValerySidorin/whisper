@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
 	"github.com/valyala/fasthttp"
 )
 
@@ -16,20 +13,8 @@ type Handler struct {
 	eventHandler *domain.EventHandler
 }
 
-func New(cfg *config.Handler, r port.MessageRenderer) (*Handler, error) {
-	exporters := make([]port.Exporter, 0)
-	for _, v := range cfg.Exporters {
-		e, err := messenger.GetExporter(&v, r)
-		if err != nil {
-			return nil, err
-		}
-		exporters = append(exporters, e)
-	}
-	p, err := vcshosting.GetEventParser(cfg)
-	if err != nil {
-		return nil, err
-	}
-	eh := domain.NewEventHandler(exporters, p)
+func New(m port.Messenger, p port.EventParser) (*Handler, error) {
+	eh := domain.NewEventHandler(m, p)
 	h := &Handler{}
 	h.eventHandler = eh
 	return h, nil

@@ -2,19 +2,19 @@ package telegram
 
 import (
 	"github.com/ValerySidorin/whisper/internal/config"
-	"github.com/ValerySidorin/whisper/internal/domain/dto"
+	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type TelegramExporter struct {
+type TelegramMessenger struct {
 	renderer port.MessageRenderer
 	bot      *tgbotapi.BotAPI
 	chatIDs  []int
 }
 
-func NewExporter(cfg *config.Exporter, r port.MessageRenderer) (*TelegramExporter, error) {
-	opts, err := NewTelegramOptions(cfg.Options)
+func RegisterTelegram(cfg *config.Configuration, r port.MessageRenderer) (*TelegramMessenger, error) {
+	opts, err := NewTelegramOptions(cfg.Messenger.Options)
 	if err != nil {
 		return nil, err
 	}
@@ -22,14 +22,14 @@ func NewExporter(cfg *config.Exporter, r port.MessageRenderer) (*TelegramExporte
 	if err != nil {
 		return nil, err
 	}
-	return &TelegramExporter{
+	return &TelegramMessenger{
 		bot:      bot,
 		chatIDs:  opts.ChatIDs,
 		renderer: r,
 	}, nil
 }
 
-func (te *TelegramExporter) SendMergeRequest(mr *dto.MergeRequest) error {
+func (te *TelegramMessenger) SendMergeRequest(mr *dto.MergeRequest) error {
 	msg := te.renderer.RenderMergeRequest(mr)
 	if msg != "" {
 		for _, chatID := range te.chatIDs {
@@ -43,7 +43,7 @@ func (te *TelegramExporter) SendMergeRequest(mr *dto.MergeRequest) error {
 	return nil
 }
 
-func (te *TelegramExporter) SendDeployment(d *dto.Deployment) error {
+func (te *TelegramMessenger) SendDeployment(d *dto.Deployment) error {
 	msg := te.renderer.RenderDeployment(d)
 	if msg != "" {
 		for _, chatID := range te.chatIDs {

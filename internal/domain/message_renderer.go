@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/ValerySidorin/whisper/internal/domain/dto"
+	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 )
 
 type DefaultMessageRenderer struct {

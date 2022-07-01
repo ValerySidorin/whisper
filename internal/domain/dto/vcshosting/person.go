@@ -1,4 +1,4 @@
-package dto
+package vcshosting
 
 type Person struct {
 	Name     string

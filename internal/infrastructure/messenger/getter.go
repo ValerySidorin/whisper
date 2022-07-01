@@ -8,11 +8,11 @@ import (
 	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
 )
 
-func GetExporter(cfg *config.Exporter, r port.MessageRenderer) (port.Exporter, error) {
-	switch cfg.Provider {
+func Register(cfg *config.Configuration, r port.MessageRenderer) (port.Messenger, error) {
+	switch cfg.Messenger.Provider {
 	case "telegram":
-		return telegram.NewExporter(cfg, r)
+		return telegram.RegisterTelegram(&cfg.Messenger, r)
 	default:
-		return nil, fmt.Errorf("unknown messenger: %v", cfg.Provider)
+		return nil, fmt.Errorf("unknown messenger: %v", cfg.Messenger.Provider)
 	}
 }

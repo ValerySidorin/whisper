@@ -3,8 +3,10 @@ package config
 import "time"
 
 type Configuration struct {
-	Http     HTTP
-	Handlers []Handler
+	Http       HTTP
+	VCSHosting VCSHosting
+	Messenger  Messenger
+	Handlers   []Handler
 }
 
 type HTTP struct {
@@ -17,13 +19,11 @@ func (h *HTTP) GetTimeout() time.Duration {
 }
 
 type Handler struct {
-	VCSHosting VCSHosting
-	Route      string
-	Action     string
-	Exporters  []Exporter
+	Route  string
+	Action string
 }
 
-type Exporter struct {
+type Messenger struct {
 	Provider string
 	Options  map[string]interface{}
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/ValerySidorin/whisper/internal/config"
-	"github.com/ValerySidorin/whisper/internal/domain/dto"
+	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/converters"
 	"github.com/xanzy/go-gitlab"
 )
@@ -13,8 +13,8 @@ type GitlabEventParser struct {
 	Client *gitlab.Client
 }
 
-func NewEventParser(cfg *config.Handler) (*GitlabEventParser, error) {
-	opts, err := NewGitlabOptions(cfg.VCSHosting.Options)
+func NewEventParser(cfg *config.VCSHosting) (*GitlabEventParser, error) {
+	opts, err := NewGitlabOptions(cfg.Options)
 	if err != nil {
 		return nil, err
 	}

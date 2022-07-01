@@ -10,6 +10,8 @@ import (
 	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
 )
@@ -20,7 +22,15 @@ func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
 	defaultMessageRenderer := domain.RegisterDefaultMessageRenderer()
-	router, err := routes.Register(configuration, defaultMessageRenderer)
+	portMessenger, err := messenger.Register(configuration, defaultMessageRenderer)
+	if err != nil {
+		return nil, err
+	}
+	eventParser, err := vcshosting.RegisterEventParser(configuration)
+	if err != nil {
+		return nil, err
+	}
+	router, err := routes.Register(configuration, portMessenger, eventParser, defaultMessageRenderer)
 	if err != nil {
 		return nil, err
 	}

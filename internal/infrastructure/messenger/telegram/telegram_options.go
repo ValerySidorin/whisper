@@ -14,7 +14,7 @@ func NewTelegramOptions(opts map[string]interface{}) (*TelegramOptions, error) {
 	if !ok {
 		return nil, errors.New("telegram token is not present")
 	}
-	chatIDs, ok := opts["chatIds"]
+	chatIDs, ok := opts["chatids"]
 	if !ok {
 		return nil, errors.New("telegram chat IDs not present")
 	}

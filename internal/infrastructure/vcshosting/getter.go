@@ -8,10 +8,10 @@ import (
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 )
 
-func GetEventParser(cfg *config.Handler) (port.EventParser, error) {
+func RegisterEventParser(cfg *config.Configuration) (port.EventParser, error) {
 	switch cfg.VCSHosting.Provider {
 	case "gitlab":
-		return gitlab.NewEventParser(cfg)
+		return gitlab.NewEventParser(&cfg.VCSHosting)
 	default:
 		return nil, errors.New("unknown vcshosting")
 	}

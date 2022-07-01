@@ -1,8 +1,8 @@
 package port
 
-import "github.com/ValerySidorin/whisper/internal/domain/dto"
+import dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 
-type Exporter interface {
+type Messenger interface {
 	SendMergeRequest(mr *dto.MergeRequest) error
 	SendDeployment(d *dto.Deployment) error
 }

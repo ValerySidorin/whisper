@@ -5,15 +5,15 @@ import (
 )
 
 type EventHandler struct {
-	exporters   []port.Exporter
+	messenger   port.Messenger
 	eventParser port.EventParser
 }
 
 func NewEventHandler(
-	exps []port.Exporter,
+	m port.Messenger,
 	p port.EventParser) *EventHandler {
 	return &EventHandler{
-		exporters:   exps,
+		messenger:   m,
 		eventParser: p,
 	}
 }
@@ -23,10 +23,8 @@ func (h *EventHandler) HandleMergeRequest(body []byte) error {
 	if err != nil {
 		return err
 	}
-	for _, v := range h.exporters {
-		if err := v.SendMergeRequest(e); err != nil {
-			return err
-		}
+	if err := h.messenger.SendMergeRequest(e); err != nil {
+		return err
 	}
 	return nil
 }
@@ -36,10 +34,8 @@ func (h *EventHandler) HandleDeployment(body []byte) error {
 	if err != nil {
 		return err
 	}
-	for _, v := range h.exporters {
-		if err := v.SendDeployment(e); err != nil {
-			return err
-		}
+	if err := h.messenger.SendDeployment(e); err != nil {
+		return err
 	}
 	return nil
 }
