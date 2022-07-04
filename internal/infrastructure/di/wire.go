@@ -8,8 +8,8 @@ import (
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
 	"github.com/google/wire"
@@ -18,13 +18,15 @@ import (
 func InitWebServer() (*web.Server, error) {
 	wire.Build(
 		wire.Bind(new(port.MessageRenderer), new(*domain.DefaultMessageRenderer)),
+		wire.Bind(new(port.Messenger), new(*telegram.TelegramMessenger)),
+		wire.Bind(new(port.EventParser), new(*gitlab.GitlabEventParser)),
 
 		routes.Register,
 		web.Register,
 		appctx.Register,
 		config.Register,
-		messenger.Register,
-		vcshosting.RegisterEventParser,
+		telegram.Register,
+		gitlab.RegisterEventParser,
 		domain.RegisterDefaultMessageRenderer,
 	)
 	return &web.Server{}, nil

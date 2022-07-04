@@ -10,7 +10,7 @@ import (
 )
 
 var serverCmd = &cobra.Command{
-	Use:   "server",
+	Use:   "serve",
 	Short: "Run whisper server",
 	Long:  `Run whisper server`,
 	RunE: func(cmd *cobra.Command, args []string) error {

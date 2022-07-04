@@ -13,8 +13,8 @@ type GitlabEventParser struct {
 	Client *gitlab.Client
 }
 
-func NewEventParser(cfg *config.VCSHosting) (*GitlabEventParser, error) {
-	opts, err := NewGitlabOptions(cfg.Options)
+func RegisterEventParser(cfg *config.Configuration) (*GitlabEventParser, error) {
+	opts, err := NewGitlabOptions(cfg.VCSHosting.Options)
 	if err != nil {
 		return nil, err
 	}

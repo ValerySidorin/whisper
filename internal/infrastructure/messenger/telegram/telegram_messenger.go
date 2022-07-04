@@ -13,7 +13,7 @@ type TelegramMessenger struct {
 	chatIDs  []int
 }
 
-func RegisterTelegram(cfg *config.Configuration, r port.MessageRenderer) (*TelegramMessenger, error) {
+func Register(cfg *config.Configuration, r port.MessageRenderer) (*TelegramMessenger, error) {
 	opts, err := NewTelegramOptions(cfg.Messenger.Options)
 	if err != nil {
 		return nil, err
