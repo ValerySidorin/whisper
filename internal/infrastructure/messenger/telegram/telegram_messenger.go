@@ -117,6 +117,8 @@ func (te *TelegramMessenger) BotListenAndServe() {
 								te.SendMessage(int64(update.SentFrom().ID), "Gracias! You are registered now!")
 							}
 						}
+					} else {
+						te.SendMessage(int64(update.SentFrom().ID), "I don't know this command...")
 					}
 				}
 			}
