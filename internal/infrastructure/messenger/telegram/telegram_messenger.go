@@ -83,21 +83,30 @@ func (te *TelegramMessenger) BotListenAndServe() {
 			continue
 		}
 		if reflect.TypeOf(update.Message.Text).Kind() == reflect.String && update.Message.Text != "" {
-			var user *storage.User
 			switch update.Message.Text {
 			case "/start":
-				user = &storage.User{
-					VCSHostingType:  vcsType,
-					MessengerType:   dto.Telegram,
-					State:           dto.Registering,
-					MessengerUserID: update.SentFrom().ID,
-				}
-				_, err := te.storage.AddUser(user)
+				user, err := te.storage.GetUser(vcsType, dto.Telegram, update.SentFrom().ID)
 				if err != nil {
-					te.SendMessage(int64(update.SentFrom().ID), "An error occured while registering you in whisper app. Try again later.")
+					te.SendMessage(int64(update.SentFrom().ID), "An error occured while fetching your data from my DB! Try again later!")
 				} else {
-					te.SendMessage(int64(update.SentFrom().ID), "Hello! Let's try to register! Give me your vcs user ID:")
+					if user != nil {
+						te.SendMessage(int64(update.SentFrom().ID), "Hey! You are registered already!")
+					} else {
+						user = &storage.User{
+							VCSHostingType:  vcsType,
+							MessengerType:   dto.Telegram,
+							State:           dto.Registering,
+							MessengerUserID: update.SentFrom().ID,
+						}
+						_, err := te.storage.AddUser(user)
+						if err != nil {
+							te.SendMessage(int64(update.SentFrom().ID), "An error occured while registering you in whisper app. Try again later.")
+						} else {
+							te.SendMessage(int64(update.SentFrom().ID), "Hello! Let's try to register! Give me your vcs user ID:")
+						}
+					}
 				}
+
 			default:
 				user, err := te.storage.GetUser(vcsType, dto.Telegram, update.SentFrom().ID)
 				if err != nil {
