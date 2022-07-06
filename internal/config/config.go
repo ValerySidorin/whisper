@@ -1,11 +1,16 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/ValerySidorin/whisper/internal/domain/dto"
+)
 
 type Configuration struct {
 	Http       HTTP
 	VCSHosting VCSHosting
 	Messenger  Messenger
+	Storage    Storage
 	Handlers   []Handler
 }
 
@@ -24,11 +29,16 @@ type Handler struct {
 }
 
 type Messenger struct {
-	Provider string
+	Provider dto.MessengerType
 	Options  map[string]interface{}
 }
 
 type VCSHosting struct {
-	Provider string
+	Provider dto.VCSHostingType
+	Options  map[string]interface{}
+}
+
+type Storage struct {
+	Provider dto.StorageType
 	Options  map[string]interface{}
 }

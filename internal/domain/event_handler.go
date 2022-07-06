@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"github.com/ValerySidorin/whisper/internal/domain/port"
-)
+import "github.com/ValerySidorin/whisper/internal/domain/port"
 
 type EventHandler struct {
 	messenger   port.Messenger

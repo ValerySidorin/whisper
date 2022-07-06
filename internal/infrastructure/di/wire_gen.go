@@ -11,6 +11,7 @@ import (
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/storage/gorm"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
@@ -22,7 +23,11 @@ func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
 	defaultMessageRenderer := domain.RegisterDefaultMessageRenderer()
-	telegramMessenger, err := telegram.Register(configuration, defaultMessageRenderer)
+	gormStorage, err := gorm.Register(configuration)
+	if err != nil {
+		return nil, err
+	}
+	telegramMessenger, err := telegram.Register(configuration, defaultMessageRenderer, gormStorage)
 	if err != nil {
 		return nil, err
 	}

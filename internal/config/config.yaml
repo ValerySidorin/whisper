@@ -4,14 +4,19 @@ http:
 vcshosting:
   provider: gitlab
   options:
-    token: <your gitlab token>
-    url: https://your-gitlab-address
+    token: <vcs-token>
+    url: https://vcs-url
 messenger:
   provider: telegram
   options:
-    token: <your telegram bot token>
+    token: bot:token
     chatIds:
-    - 123
+    - 877240015
+storage:
+  provider: gorm
+  options:
+    driver: "sqlserver"
+    dsn: "sqlserver://user:password@127.0.0.1:1433?database=Whisper"
 handlers:
 - route: "/gitlab/merge-request"
   action: merge_request

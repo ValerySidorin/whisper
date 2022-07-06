@@ -39,7 +39,8 @@ func init() {
 
 func loadConfig(cfgPath string) error {
 	log.Println("pid: " + strconv.Itoa(os.Getpid()))
-	_, err := config.LoadDefaultConfigByViper(cfgPath)
+	cfg, err := config.LoadDefaultConfigByViper(cfgPath)
+	log.Println(cfg)
 	if err != nil {
 		return errors.Wrap(err, "error while loading configuration")
 	}
