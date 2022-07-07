@@ -1,3 +1,3 @@
 # Whisper
 
-Whisper is a telegram bot for Gitlab events using webhooks
+Whisper is your CI notifier. Currently supports GitLab -> Telegram
