@@ -4,14 +4,12 @@ http:
 vcshosting:
   provider: gitlab
   options:
-    token: <vcs-token>
-    url: https://vcs-url
+    token: <vcs_token>
+    url: https://vcs_url
 messenger:
   provider: telegram
   options:
-    token: bot:token
-    chatIds:
-    - 877240015
+    token: <messenger_token>
 storage:
   provider: gorm
   options:
@@ -22,3 +20,5 @@ handlers:
   action: merge_request
 - route: "/gitlab/deployment"
   action: deployment
+  defaultChatIds:
+  - 1

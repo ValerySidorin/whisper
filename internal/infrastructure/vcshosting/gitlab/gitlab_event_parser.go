@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/ValerySidorin/whisper/internal/config"
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
@@ -25,20 +26,24 @@ func RegisterEventParser(cfg *config.Configuration) (*GitlabEventParser, error) 
 	return &GitlabEventParser{Client: c}, nil
 }
 
-func (p *GitlabEventParser) ParseMergeRequest(body []byte) (*dto.MergeRequest, error) {
+func (p *GitlabEventParser) ParseMergeRequestEvent(body []byte) (*dto.MergeRequestEvent, error) {
 	gmr := gitlab.MergeEvent{}
 	if err := json.Unmarshal(body, &gmr); err != nil {
 		return nil, err
 	}
-	conv := converters.MRConverter{MergeEvent: &gmr}
+	a, _, err := p.Client.Users.GetUser(gmr.ObjectAttributes.AuthorID, gitlab.GetUsersOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("error fetching merge request author: %s", err)
+	}
+	conv := converters.MREventConverter{MergeEvent: &gmr, User: a}
 	m, err := conv.Convert()
 	if err != nil {
 		return nil, err
 	}
-	return m.(*dto.MergeRequest), nil
+	return m.(*dto.MergeRequestEvent), nil
 }
 
-func (p *GitlabEventParser) ParseDeployment(body []byte) (*dto.Deployment, error) {
+func (p *GitlabEventParser) ParseDeploymentEvent(body []byte) (*dto.DeploymentEvent, error) {
 	gd := gitlab.DeploymentEvent{}
 	if err := json.Unmarshal(body, &gd); err != nil {
 		return nil, err
@@ -47,10 +52,10 @@ func (p *GitlabEventParser) ParseDeployment(body []byte) (*dto.Deployment, error
 	if err != nil {
 		return nil, err
 	}
-	conv := converters.DeploymentConverter{DeploymentEvent: &gd, Job: j}
+	conv := converters.DeploymentEventConverter{DeploymentEvent: &gd, Job: j}
 	m, err := conv.Convert()
 	if err != nil {
 		return nil, err
 	}
-	return m.(*dto.Deployment), nil
+	return m.(*dto.DeploymentEvent), nil
 }

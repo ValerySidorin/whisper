@@ -24,8 +24,9 @@ func (h *HTTP) GetTimeout() time.Duration {
 }
 
 type Handler struct {
-	Route  string
-	Action string
+	Route          string
+	Action         string
+	DefaultChatIDs []int64
 }
 
 type Messenger struct {

@@ -27,7 +27,7 @@ func InitWebServer() (*web.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	telegramMessenger, err := telegram.Register(configuration, defaultMessageRenderer, gormStorage)
+	telegramMessengerService, err := telegram.Register(configuration, defaultMessageRenderer, gormStorage)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,8 @@ func InitWebServer() (*web.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	router, err := routes.Register(configuration, telegramMessenger, gitlabEventParser, defaultMessageRenderer)
+	defaultMessengerBot := domain.NewMessengerBot(configuration, gormStorage, defaultMessageRenderer, telegramMessengerService)
+	router, err := routes.Register(configuration, defaultMessengerBot, gitlabEventParser, defaultMessageRenderer, gormStorage)
 	if err != nil {
 		return nil, err
 	}

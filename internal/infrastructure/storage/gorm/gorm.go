@@ -51,9 +51,18 @@ func (gs *GormStorage) AddUser(u *storage.User) (*storage.User, error) {
 	return u, nil
 }
 
-func (gs *GormStorage) GetUser(vcsType dto.VCSHostingType, messengerType dto.MessengerType, messengerUserID int64) (*storage.User, error) {
+func (gs *GormStorage) GetUserByMessenger(vcsType dto.VCSHostingType, messengerType dto.MessengerType, messengerUserID int64) (*storage.User, error) {
 	u := storage.User{}
 	result := gs.gormDB.Where("vcs_hosting_type = ? and messenger_type = ? and messenger_user_id = ?", vcsType, messengerType, messengerUserID).First(&u)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &u, nil
+}
+
+func (gs *GormStorage) GetUserByVCSHosting(vcsType dto.VCSHostingType, messengerType dto.MessengerType, vcsHostingUserID int64) (*storage.User, error) {
+	u := storage.User{}
+	result := gs.gormDB.Where("vcs_hosting_type = ? and messenger_type = ? and vcs_hosting_user_id = ?", vcsType, messengerType, vcsHostingUserID).First(&u)
 	if result.Error != nil {
 		return nil, result.Error
 	}

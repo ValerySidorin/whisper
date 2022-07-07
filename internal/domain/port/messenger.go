@@ -1,10 +1,8 @@
 package port
 
-import dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
+import "github.com/ValerySidorin/whisper/internal/domain/dto"
 
-type Messenger interface {
-	SendMergeRequest(mr *dto.MergeRequest) error
-	SendDeployment(d *dto.Deployment) error
+type MessengerService interface {
 	SendMessage(chatID int64, msg string) error
-	BotListenAndServe()
+	GetMessengerType() dto.MessengerType
 }

@@ -5,8 +5,7 @@ import (
 )
 
 type TelegramOptions struct {
-	Token   string
-	ChatIDs []int
+	Token string
 }
 
 func NewTelegramOptions(opts map[string]interface{}) (*TelegramOptions, error) {
@@ -14,16 +13,7 @@ func NewTelegramOptions(opts map[string]interface{}) (*TelegramOptions, error) {
 	if !ok {
 		return nil, errors.New("telegram token is not present")
 	}
-	chatIDs, ok := opts["chatids"]
-	if !ok {
-		return nil, errors.New("telegram chat IDs not present")
-	}
-	intIDs := make([]int, 0)
-	for _, v := range chatIDs.([]interface{}) {
-		intIDs = append(intIDs, v.(int))
-	}
 	return &TelegramOptions{
-		Token:   token.(string),
-		ChatIDs: intIDs,
+		Token: token.(string),
 	}, nil
 }
