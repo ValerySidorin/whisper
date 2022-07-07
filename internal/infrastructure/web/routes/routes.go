@@ -8,11 +8,11 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func Register(cfg config.Configuration, rndr port.MessageRenderer) (*router.Router, error) {
+func Register(cfg *config.Configuration, b port.MessengerBot, p port.EventParser, rndr port.MessageRenderer, s port.Storager) (*router.Router, error) {
 	r := router.New()
 	r.GET("/", DefaultHandlerFunc)
 	for _, v := range cfg.Handlers {
-		h, err := handler.New(&v, rndr)
+		h, err := handler.New(cfg, b, p, s, v.DefaultChatIDs)
 		if err != nil {
 			return nil, err
 		}

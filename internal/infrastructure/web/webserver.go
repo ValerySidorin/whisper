@@ -30,7 +30,7 @@ type Server struct {
 func Register(
 	ctx *appctx.CoreContext,
 	routes *router.Router,
-	cfg config.Configuration,
+	cfg *config.Configuration,
 ) *Server {
 	webServer := new(Server)
 	webServer.Router = routes

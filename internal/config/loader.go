@@ -9,8 +9,8 @@ import (
 
 var gConfig Configuration
 
-func Register() Configuration {
-	return gConfig
+func Register() *Configuration {
+	return &gConfig
 }
 
 func LoadDefaultConfigByViper(cfgPath string) (Configuration, error) {
