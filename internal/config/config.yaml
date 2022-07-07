@@ -1,30 +1,24 @@
 http:
   port: 9774
   timeout: 30
+vcshosting:
+  provider: gitlab
+  options:
+    token: <vcs_token>
+    url: https://vcs_url
+messenger:
+  provider: telegram
+  options:
+    token: <messenger_token>
+storage:
+  provider: gorm
+  options:
+    driver: "sqlserver"
+    dsn: "sqlserver://user:password@127.0.0.1:1433?database=Whisper"
 handlers:
-- vcshosting:
-    provider: gitlab
-    options:
-      token: glpat-4L9rqBQdsHzj18fG7-qe
-      url: https://gitlab.emsoft.ru
-  route: "/gitlab/merge-request"
+- route: "/gitlab/merge-request"
   action: merge_request
-  exporters:
-  - provider: telegram
-    options:
-      token: 5577541047:AAGeDDYUK73aWNCT2e91xJpULVx6wbhSxuA
-      chatIds:
-      - 877240015
-- vcshosting:
-    provider: gitlab
-    options:
-      token: glpat-4L9rqBQdsHzj18fG7-qe
-      url: https://gitlab.emsoft.ru
-  route: "/gitlab/deployment"
+- route: "/gitlab/deployment"
   action: deployment
-  exporters:
-  - provider: telegram
-    options:
-      token: 5577541047:AAGeDDYUK73aWNCT2e91xJpULVx6wbhSxuA
-      chatIds:
-      - 877240015
+  defaultChatIds:
+  - 1

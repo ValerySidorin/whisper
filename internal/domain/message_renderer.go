@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/ValerySidorin/whisper/internal/domain/dto"
+	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 )
 
 type DefaultMessageRenderer struct {
@@ -11,21 +11,26 @@ func RegisterDefaultMessageRenderer() *DefaultMessageRenderer {
 	return &DefaultMessageRenderer{}
 }
 
-func (r *DefaultMessageRenderer) RenderMergeRequest(mr *dto.MergeRequest) string {
-	switch mr.State {
+func (r *DefaultMessageRenderer) RenderMergeRequestEvent(mre *dto.MergeRequestEvent) string {
+	switch mre.MergeRequest.State {
 	case "opened":
-		return "New Merge Request! | " + mr.Project.Name + "\n-- -- -- --\nTitle: " + mr.Title + "\nDescription:  + " + mr.Description + "\n" + mr.URL + "\n-- -- -- --\nBranch: " + mr.SourceBranch + "→ " + mr.TargetBranch + "\nAuthor: " + mr.Author.Name
+		if mre.Event == "update" {
+			return "Merge Request has been updated! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
+		}
+		return "New Merge Request! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
+	case "merged":
+		return "Congrats! you have been merged!" + "\n-- -- -- --\n" + mre.MergeRequest.URL
 	default:
 		return ""
 	}
 }
 
-func (r *DefaultMessageRenderer) RenderDeployment(d *dto.Deployment) string {
-	switch d.Status {
+func (r *DefaultMessageRenderer) RenderDeploymentEvent(de *dto.DeploymentEvent) string {
+	switch de.Deployment.Status {
 	case "success":
-		return "Deployment succeded! | " + d.Project.Name + "\n-- -- -- --\nEnv: " + d.Environment + "\n-- -- -- --\nJob: " + d.Job.Name + "\n-- -- -- --\nCommit: " + d.CommitTitle + "\n" + d.CommitURL + "\n-- -- -- --\nInitiator: " + d.User.Name
+		return "Deployment succeded! | " + de.Deployment.Project.Name + "\n-- -- -- --\nEnv: " + de.Deployment.Environment + "\n-- -- -- --\nJob: " + de.Deployment.Job.Name + "\n-- -- -- --\nCommit: " + de.Deployment.CommitTitle + "\n" + de.Deployment.CommitURL + "\n-- -- -- --\nInitiator: " + de.Deployment.User.Name
 	case "failed":
-		return "Deployment failed! | " + d.Project.Name + "\n-- -- -- --\nEnv: " + d.Environment + "\n-- -- -- --\n-- -- -- --\nJob: " + d.Job.Name + "\n" + d.DeployableURL
+		return "Deployment failed! | " + de.Deployment.Project.Name + "\n-- -- -- --\nEnv: " + de.Deployment.Environment + "\n-- -- -- --\nJob: " + de.Deployment.Job.Name + "\n" + de.Deployment.DeployableURL
 	default:
 		return ""
 	}

@@ -1,10 +1,17 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/ValerySidorin/whisper/internal/domain/dto"
+)
 
 type Configuration struct {
-	Http     HTTP
-	Handlers []Handler
+	Http       HTTP
+	VCSHosting VCSHosting
+	Messenger  Messenger
+	Storage    Storage
+	Handlers   []Handler
 }
 
 type HTTP struct {
@@ -17,18 +24,22 @@ func (h *HTTP) GetTimeout() time.Duration {
 }
 
 type Handler struct {
-	VCSHosting VCSHosting
-	Route      string
-	Action     string
-	Exporters  []Exporter
+	Route          string
+	Action         string
+	DefaultChatIDs []int64
 }
 
-type Exporter struct {
-	Provider string
+type Messenger struct {
+	Provider dto.MessengerType
 	Options  map[string]interface{}
 }
 
 type VCSHosting struct {
-	Provider string
+	Provider dto.VCSHostingType
+	Options  map[string]interface{}
+}
+
+type Storage struct {
+	Provider dto.StorageType
 	Options  map[string]interface{}
 }

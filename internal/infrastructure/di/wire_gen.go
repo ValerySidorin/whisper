@@ -10,6 +10,9 @@ import (
 	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/storage/gorm"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
 )
@@ -20,7 +23,20 @@ func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
 	defaultMessageRenderer := domain.RegisterDefaultMessageRenderer()
-	router, err := routes.Register(configuration, defaultMessageRenderer)
+	gormStorage, err := gorm.Register(configuration)
+	if err != nil {
+		return nil, err
+	}
+	telegramMessengerService, err := telegram.Register(configuration, defaultMessageRenderer, gormStorage)
+	if err != nil {
+		return nil, err
+	}
+	gitlabEventParser, err := gitlab.RegisterEventParser(configuration)
+	if err != nil {
+		return nil, err
+	}
+	defaultMessengerBot := domain.NewMessengerBot(configuration, gormStorage, defaultMessageRenderer, telegramMessengerService)
+	router, err := routes.Register(configuration, defaultMessengerBot, gitlabEventParser, defaultMessageRenderer, gormStorage)
 	if err != nil {
 		return nil, err
 	}

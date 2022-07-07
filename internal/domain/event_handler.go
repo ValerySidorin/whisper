@@ -1,44 +1,75 @@
 package domain
 
 import (
+	"fmt"
+
+	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 )
 
 type EventHandler struct {
-	exporters   []port.Exporter
-	eventParser port.EventParser
+	vcsType        dto.VCSHostingType
+	messengerType  dto.MessengerType
+	baseBot        port.MessengerBot
+	eventParser    port.EventParser
+	storage        port.Storager
+	defaultChatIDs []int64
 }
 
 func NewEventHandler(
-	exps []port.Exporter,
-	p port.EventParser) *EventHandler {
+	cfg *config.Configuration,
+	b port.MessengerBot,
+	p port.EventParser,
+	s port.Storager,
+	cIDs []int64) *EventHandler {
 	return &EventHandler{
-		exporters:   exps,
-		eventParser: p,
+		vcsType:        cfg.VCSHosting.Provider,
+		messengerType:  cfg.Messenger.Provider,
+		baseBot:        b,
+		eventParser:    p,
+		storage:        s,
+		defaultChatIDs: cIDs,
 	}
 }
 
 func (h *EventHandler) HandleMergeRequest(body []byte) error {
-	e, err := h.eventParser.ParseMergeRequest(body)
+	e, err := h.eventParser.ParseMergeRequestEvent(body)
 	if err != nil {
-		return err
+		return fmt.Errorf("error parsing merge request: %s", err)
 	}
-	for _, v := range h.exporters {
-		if err := v.SendMergeRequest(e); err != nil {
-			return err
+	assignee, _ := h.storage.GetUserByVCSHosting(h.vcsType, h.messengerType, e.MergeRequest.Assignee.ID)
+	author, _ := h.storage.GetUserByVCSHosting(h.vcsType, h.messengerType, e.MergeRequest.Author.ID)
+	if e.MergeRequest.State == "opened" {
+		if assignee != nil {
+			if err := h.baseBot.SendMergeRequestEvent(e, assignee.MessengerUserID); err != nil {
+				return fmt.Errorf("error sending merge request to assignee: %s", err)
+			}
+		}
+	}
+	if e.MergeRequest.State == "merged" {
+		if author != nil {
+			if err := h.baseBot.SendMergeRequestEvent(e, author.MessengerUserID); err != nil {
+				return fmt.Errorf("error sending merge request to author: %s", err)
+			}
+		}
+	}
+	for _, v := range h.defaultChatIDs {
+		if err := h.baseBot.SendMergeRequestEvent(e, v); err != nil {
+			return fmt.Errorf("error sending merge request to chat %v: %s", v, err)
 		}
 	}
 	return nil
 }
 
 func (h *EventHandler) HandleDeployment(body []byte) error {
-	e, err := h.eventParser.ParseDeployment(body)
+	e, err := h.eventParser.ParseDeploymentEvent(body)
 	if err != nil {
-		return err
+		return fmt.Errorf("error parsing deployment: %s", err)
 	}
-	for _, v := range h.exporters {
-		if err := v.SendDeployment(e); err != nil {
-			return err
+	for _, v := range h.defaultChatIDs {
+		if err := h.baseBot.SendDeploymentEvent(e, v); err != nil {
+			return fmt.Errorf("error sending deployment to chat %v: %s", v, err)
 		}
 	}
 	return nil
