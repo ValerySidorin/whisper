@@ -47,7 +47,7 @@ func (h *EventHandler) HandleMergeRequest(body []byte) error {
 			}
 		}
 	}
-	if e.MergeRequest.State == "merged" {
+	if e.MergeRequest.State == "merged" || e.MergeRequest.State == "closed" {
 		if author != nil {
 			if err := h.baseBot.SendMergeRequestEvent(e, author.MessengerUserID); err != nil {
 				return fmt.Errorf("error sending merge request to author: %s", err)

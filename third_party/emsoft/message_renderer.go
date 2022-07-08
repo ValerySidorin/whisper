@@ -28,6 +28,8 @@ func (r *EmsoftMessageRenderer) RenderMergeRequestEvent(mre *dto.MergeRequestEve
 		return "New Merge Request! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nTracker: " + trackerLink + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
 	case "merged":
 		return "Merge Request has been merged!" + "\n-- -- -- --\n" + mre.MergeRequest.URL
+	case "closed":
+		return "Merge Request has been closed!" + "\n-- -- -- --\n" + mre.MergeRequest.URL
 	default:
 		return ""
 	}
