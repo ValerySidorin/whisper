@@ -15,6 +15,7 @@ import (
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/routes"
+	"github.com/ValerySidorin/whisper/third_party/emsoft"
 )
 
 // Injectors from wire.go:
@@ -22,7 +23,7 @@ import (
 func InitWebServer() (*web.Server, error) {
 	coreContext := appctx.Register()
 	configuration := config.Register()
-	defaultMessageRenderer := domain.RegisterDefaultMessageRenderer()
+	defaultMessageRenderer := emsoft.RegisterEmsoftMessageRenderer()
 	gormStorage, err := gorm.Register(configuration)
 	if err != nil {
 		return nil, err
