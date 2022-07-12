@@ -4,10 +4,10 @@
 package di
 
 import (
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/storage/gorm"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab"

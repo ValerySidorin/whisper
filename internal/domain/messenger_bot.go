@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/dto/storage"
 	vcsdto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
@@ -17,7 +16,7 @@ type DefaultMessengerBot struct {
 	messenger port.MessengerService
 }
 
-func NewMessengerBot(cfg *config.Configuration, s port.Storager, r port.MessageRenderer, m port.MessengerService) *DefaultMessengerBot {
+func NewMessengerBot(s port.Storager, r port.MessageRenderer, m port.MessengerService) *DefaultMessengerBot {
 	return &DefaultMessengerBot{
 		storage:   s,
 		renderer:  r,

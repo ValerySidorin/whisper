@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 )
@@ -18,14 +17,15 @@ type EventHandler struct {
 }
 
 func NewEventHandler(
-	cfg *config.Configuration,
+	vscType dto.VCSHostingType,
+	messengerType dto.MessengerType,
 	b port.MessengerBot,
 	p port.EventParser,
 	s port.Storager,
 	cIDs []int64) *EventHandler {
 	return &EventHandler{
-		vcsType:        cfg.VCSHosting.Provider,
-		messengerType:  cfg.Messenger.Provider,
+		vcsType:        vscType,
+		messengerType:  messengerType,
 		baseBot:        b,
 		eventParser:    p,
 		storage:        s,
@@ -47,7 +47,7 @@ func (h *EventHandler) HandleMergeRequest(body []byte) error {
 			}
 		}
 	}
-	if e.MergeRequest.State == "merged" {
+	if e.MergeRequest.State == "merged" || e.MergeRequest.State == "closed" {
 		if author != nil {
 			if err := h.baseBot.SendMergeRequestEvent(e, author.MessengerUserID); err != nil {
 				return fmt.Errorf("error sending merge request to author: %s", err)

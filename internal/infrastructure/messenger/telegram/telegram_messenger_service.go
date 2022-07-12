@@ -1,10 +1,10 @@
 package telegram
 
 import (
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -25,7 +25,7 @@ func Register(cfg *config.Configuration, r port.MessageRenderer, storage port.St
 	m := &TelegramMessenger{
 		bot: bot,
 	}
-	m.baseBot = domain.NewMessengerBot(cfg, storage, r, m)
+	m.baseBot = domain.NewMessengerBot(storage, r, m)
 	go m.telegramBotListenAndServe(cfg.VCSHosting.Provider)
 	return m, nil
 }
