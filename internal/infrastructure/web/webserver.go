@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ValerySidorin/whisper/internal/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/valyala/fasthttp"
 )
 
@@ -15,7 +15,7 @@ type Handler struct {
 }
 
 func New(cfg *config.Configuration, bot port.MessengerBot, p port.EventParser, s port.Storager, cIds []int64) (*Handler, error) {
-	eh := domain.NewEventHandler(cfg, bot, p, s, cIds)
+	eh := domain.NewEventHandler(cfg.VCSHosting.Provider, cfg.Messenger.Provider, bot, p, s, cIds)
 	h := &Handler{}
 	h.eventHandler = eh
 	return h, nil

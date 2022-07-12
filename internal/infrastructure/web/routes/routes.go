@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/handler"
 	"github.com/fasthttp/router"

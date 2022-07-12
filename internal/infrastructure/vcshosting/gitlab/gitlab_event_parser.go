@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/converters"
 	"github.com/xanzy/go-gitlab"
