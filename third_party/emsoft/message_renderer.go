@@ -25,6 +25,9 @@ func (r *EmsoftMessageRenderer) RenderMergeRequestEvent(mre *dto.MergeRequestEve
 		if mre.Event == "update" {
 			return "Merge Request has been updated! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nTracker: " + trackerLink + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
 		}
+		if mre.Event == "rebase" {
+			return "Merge Request rebase triggered! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nTracker: " + trackerLink + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
+		}
 		return "New Merge Request! | " + mre.MergeRequest.Project.Name + "\n-- -- -- --\nTitle: " + mre.MergeRequest.Title + "\nDescription: " + mre.MergeRequest.Description + "\n" + mre.MergeRequest.URL + "\n-- -- -- --\nTracker: " + trackerLink + "\n-- -- -- --\nBranch: " + mre.MergeRequest.SourceBranch + "→ " + mre.MergeRequest.TargetBranch + "\nAuthor: " + mre.MergeRequest.Author.Name
 	case "merged":
 		return "Merge Request has been merged!" + "\n-- -- -- --\n" + mre.MergeRequest.URL
