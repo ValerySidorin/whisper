@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/dto/storage"
 	"gorm.io/driver/postgres"

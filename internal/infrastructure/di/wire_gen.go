@@ -7,7 +7,7 @@
 package di
 
 import (
-	"github.com/ValerySidorin/whisper/internal/config"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/appctx"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/messenger/telegram"
@@ -36,7 +36,7 @@ func InitWebServer() (*web.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	defaultMessengerBot := domain.NewMessengerBot(configuration, gormStorage, defaultMessageRenderer, telegramMessengerService)
+	defaultMessengerBot := domain.NewMessengerBot(gormStorage, defaultMessageRenderer, telegramMessengerService)
 	router, err := routes.Register(configuration, defaultMessengerBot, gitlabEventParser, defaultMessageRenderer, gormStorage)
 	if err != nil {
 		return nil, err
