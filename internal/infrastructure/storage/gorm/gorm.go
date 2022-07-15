@@ -2,11 +2,12 @@ package gorm
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
-	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/dto/storage"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
@@ -17,25 +18,25 @@ type GormStorage struct {
 }
 
 func Register(cfg *config.Configuration) (*GormStorage, error) {
-	opts, err := NewGormOptions(cfg.Storage.Options)
+	opts, err := newGormOptions(cfg.Storage.Options)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("gorm: malformed options: %s", err)
 	}
-	log.Println(opts.Dsn)
+	log.Println(opts.dsn)
 	var db = &gorm.DB{}
 	switch {
-	case opts.Driver == "postgres":
-		db, err = gorm.Open(postgres.Open(opts.Dsn))
+	case opts.driver == "postgres":
+		db, err = gorm.Open(postgres.Open(opts.dsn))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("gorm: open db: %s", err)
 		}
-	case opts.Driver == "sqlserver":
-		db, err = gorm.Open(sqlserver.Open(opts.Dsn))
+	case opts.driver == "sqlserver":
+		db, err = gorm.Open(sqlserver.Open(opts.dsn))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("gorm: open db: %s", err)
 		}
 	default:
-		return nil, errors.New("invalid storage driver")
+		return nil, errors.New("gorm: invalid storage driver")
 	}
 	db.AutoMigrate(&storage.User{})
 	return &GormStorage{

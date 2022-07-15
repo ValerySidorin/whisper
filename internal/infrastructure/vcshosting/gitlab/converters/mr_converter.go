@@ -29,7 +29,7 @@ func NewMREventConverter(mr *gitlab.MergeEvent, u *gitlab.User) MRConverter {
 	}
 }
 
-func (c *MRConverter) Convert() (interface{}, error) {
+func (c *MRConverter) Convert() interface{} {
 	labels := make([]string, 0)
 	for _, l := range c.MergeEvent.Labels {
 		labels = append(labels, l.Name)
@@ -68,10 +68,10 @@ func (c *MRConverter) Convert() (interface{}, error) {
 		SourceBranch: c.MergeEvent.ObjectAttributes.SourceBranch,
 		TargetBranch: c.MergeEvent.ObjectAttributes.TargetBranch,
 		Labels:       labels,
-	}, nil
+	}
 }
 
-func (c *MREventConverter) Convert() (interface{}, error) {
+func (c *MREventConverter) Convert() interface{} {
 	labels := make([]string, 0)
 	for _, l := range c.MergeEvent.Labels {
 		labels = append(labels, l.Name)
@@ -114,5 +114,5 @@ func (c *MREventConverter) Convert() (interface{}, error) {
 	return &dto.MergeRequestEvent{
 		MergeRequest: mr,
 		Event:        c.MergeEvent.ObjectAttributes.Action,
-	}, nil
+	}
 }

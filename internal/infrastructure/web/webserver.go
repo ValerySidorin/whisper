@@ -23,7 +23,6 @@ type Server struct {
 	IsStarted atomic.Value
 	Router    *router.Router
 	Config    config.HTTP
-	Ctx       context.Context
 	Cc        *appctx.CoreContext
 }
 
@@ -37,7 +36,6 @@ func Register(
 	webServer.IsStarted.Store(false)
 	webServer.Stop = make(chan bool)
 	webServer.Config = cfg.Http
-	webServer.Ctx = ctx.Ctx()
 	webServer.Cc = ctx
 	return webServer
 }

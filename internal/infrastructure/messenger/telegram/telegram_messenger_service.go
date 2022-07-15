@@ -14,11 +14,11 @@ type TelegramMessenger struct {
 }
 
 func Register(cfg *config.Configuration, r port.MessageRenderer, storage port.Storager) (*TelegramMessenger, error) {
-	opts, err := NewTelegramOptions(cfg.Messenger.Options)
+	opts, err := newTelegramOptions(cfg.Messenger.Options)
 	if err != nil {
 		return nil, err
 	}
-	bot, err := tgbotapi.NewBotAPI(opts.Token)
+	bot, err := tgbotapi.NewBotAPI(opts.token)
 	if err != nil {
 		return nil, err
 	}

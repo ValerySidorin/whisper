@@ -29,7 +29,7 @@ func NewDeploymentEventConverter(d *gitlab.DeploymentEvent, j *gitlab.Job) Deplo
 	}
 }
 
-func (c *DeploymentConverter) Convert() (interface{}, error) {
+func (c *DeploymentConverter) Convert() interface{} {
 	return &dto.Deployment{
 		Status: c.DeploymentEvent.Status,
 		Job: dto.Job{
@@ -50,10 +50,10 @@ func (c *DeploymentConverter) Convert() (interface{}, error) {
 		},
 		CommitURL:   c.DeploymentEvent.CommitURL,
 		CommitTitle: c.DeploymentEvent.CommitTitle,
-	}, nil
+	}
 }
 
-func (c *DeploymentEventConverter) Convert() (interface{}, error) {
+func (c *DeploymentEventConverter) Convert() interface{} {
 	d := &dto.Deployment{
 		Status: c.DeploymentEvent.Status,
 		Job: dto.Job{
@@ -77,5 +77,5 @@ func (c *DeploymentEventConverter) Convert() (interface{}, error) {
 	}
 	return &dto.DeploymentEvent{
 		Deployment: d,
-	}, nil
+	}
 }
