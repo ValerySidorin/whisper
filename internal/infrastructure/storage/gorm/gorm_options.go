@@ -16,8 +16,16 @@ func newGormOptions(opts map[string]interface{}) (*gormOptions, error) {
 	if !ok {
 		return nil, errors.New("dsn string is not present")
 	}
+	dr, ok := driver.(string)
+	if !ok {
+		return nil, errors.New("driver string type assertion failed")
+	}
+	d, ok := dsn.(string)
+	if !ok {
+		return nil, errors.New("dsn string type assertion failed")
+	}
 	return &gormOptions{
-		driver: driver.(string),
-		dsn:    dsn.(string),
+		driver: dr,
+		dsn:    d,
 	}, nil
 }

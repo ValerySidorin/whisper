@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -15,12 +14,13 @@ import (
 	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
+	"go.uber.org/atomic"
 )
 
 type Server struct {
 	Server    fasthttp.Server
 	Stop      chan bool
-	IsStarted atomic.Value
+	IsStarted atomic.Bool
 	Router    *router.Router
 	Config    config.HTTP
 	Cc        *appctx.CoreContext
@@ -41,13 +41,13 @@ func Register(
 }
 
 func (w *Server) ServerStop() {
-	if w.IsStarted.Load().(bool) {
+	if w.IsStarted.Load() {
 		w.Stop <- true
 	}
 }
 
 func (w *Server) IsServerStarted() bool {
-	return w.IsStarted.Load().(bool)
+	return w.IsStarted.Load()
 }
 
 func (w *Server) Serve() {

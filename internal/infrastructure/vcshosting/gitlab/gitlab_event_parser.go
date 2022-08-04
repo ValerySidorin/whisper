@@ -7,8 +7,8 @@ import (
 
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
-	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/converters"
-	"github.com/xanzy/go-gitlab"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/vcshosting/gitlab/conv"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 type GitlabEventParser struct {
@@ -36,9 +36,12 @@ func (p *GitlabEventParser) ParseMergeRequestEvent(body []byte) (*dto.MergeReque
 	if err != nil {
 		return nil, fmt.Errorf("gitlab: fetching user error: %s", err)
 	}
-	conv := converters.MREventConverter{MergeEvent: &gmr, User: a}
-	m := conv.Convert()
-	return m.(*dto.MergeRequestEvent), nil
+	conv := conv.MREventConverter{MergeEvent: &gmr, User: a}
+	m, ok := conv.Convert().(*dto.MergeRequestEvent)
+	if !ok {
+		return nil, errors.New("gitlab: MergeRequestEvent type assertion failed")
+	}
+	return m, nil
 }
 
 func (p *GitlabEventParser) ParseDeploymentEvent(body []byte) (*dto.DeploymentEvent, error) {
@@ -50,7 +53,10 @@ func (p *GitlabEventParser) ParseDeploymentEvent(body []byte) (*dto.DeploymentEv
 	if err != nil {
 		return nil, fmt.Errorf("gitlab: get job error: %s", err)
 	}
-	conv := converters.DeploymentEventConverter{DeploymentEvent: &gd, Job: j}
-	m := conv.Convert()
-	return m.(*dto.DeploymentEvent), nil
+	conv := conv.DeploymentEventConverter{DeploymentEvent: &gd, Job: j}
+	m, ok := conv.Convert().(*dto.DeploymentEvent)
+	if !ok {
+		return nil, errors.New("gitlab: DeploymetEvent type assertion failed")
+	}
+	return m, nil
 }

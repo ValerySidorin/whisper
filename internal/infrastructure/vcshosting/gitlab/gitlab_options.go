@@ -15,8 +15,16 @@ func NewGitlabOptions(opts map[string]interface{}) (*gitlabOptions, error) {
 		return nil, errors.New("token is not present")
 	}
 	url := opts["url"]
+	t, ok := token.(string)
+	if !ok {
+		return nil, errors.New("token string type assertion failed")
+	}
+	u, ok := url.(string)
+	if !ok {
+		return nil, errors.New("url string type assertion failed")
+	}
 	return &gitlabOptions{
-		token: token.(string),
-		url:   url.(string),
+		token: t,
+		url:   u,
 	}, nil
 }

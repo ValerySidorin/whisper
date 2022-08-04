@@ -1,8 +1,8 @@
-package converters
+package conv
 
 import (
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 type DeploymentConverter struct {

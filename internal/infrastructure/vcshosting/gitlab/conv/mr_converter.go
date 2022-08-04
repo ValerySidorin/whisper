@@ -1,4 +1,4 @@
-package converters
+package conv
 
 import (
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
@@ -30,7 +30,7 @@ func NewMREventConverter(mr *gitlab.MergeEvent, u *gitlab.User) MRConverter {
 }
 
 func (c *MRConverter) Convert() interface{} {
-	labels := make([]string, 0)
+	var labels []string
 	for _, l := range c.MergeEvent.Labels {
 		labels = append(labels, l.Name)
 	}
@@ -72,7 +72,7 @@ func (c *MRConverter) Convert() interface{} {
 }
 
 func (c *MREventConverter) Convert() interface{} {
-	labels := make([]string, 0)
+	var labels []string
 	for _, l := range c.MergeEvent.Labels {
 		labels = append(labels, l.Name)
 	}
