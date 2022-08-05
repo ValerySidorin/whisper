@@ -36,27 +36,27 @@ func NewEventHandler(
 func (h *EventHandler) HandleMergeRequest(body []byte) error {
 	e, err := h.eventParser.ParseMergeRequestEvent(body)
 	if err != nil {
-		return fmt.Errorf("error parsing merge request: %s", err)
+		return fmt.Errorf("domain: error parsing merge request: %s", err)
 	}
 	assignee, _ := h.storage.GetUserByVCSHosting(h.vcsType, h.messengerType, e.MergeRequest.Assignee.ID)
 	author, _ := h.storage.GetUserByVCSHosting(h.vcsType, h.messengerType, e.MergeRequest.Author.ID)
 	if e.MergeRequest.State == "opened" {
 		if assignee != nil {
 			if err := h.baseBot.SendMergeRequestEvent(e, assignee.MessengerUserID); err != nil {
-				return fmt.Errorf("error sending merge request to assignee: %s", err)
+				return fmt.Errorf("domain: error sending merge request to assignee: %s", err)
 			}
 		}
 	}
 	if e.MergeRequest.State == "merged" || e.MergeRequest.State == "closed" {
 		if author != nil {
 			if err := h.baseBot.SendMergeRequestEvent(e, author.MessengerUserID); err != nil {
-				return fmt.Errorf("error sending merge request to author: %s", err)
+				return fmt.Errorf("domain: error sending merge request to author: %s", err)
 			}
 		}
 	}
 	for _, v := range h.defaultChatIDs {
 		if err := h.baseBot.SendMergeRequestEvent(e, v); err != nil {
-			return fmt.Errorf("error sending merge request to chat %v: %s", v, err)
+			return fmt.Errorf("domain: error sending merge request to chat %v: %s", v, err)
 		}
 	}
 	return nil
@@ -65,11 +65,11 @@ func (h *EventHandler) HandleMergeRequest(body []byte) error {
 func (h *EventHandler) HandleDeployment(body []byte) error {
 	e, err := h.eventParser.ParseDeploymentEvent(body)
 	if err != nil {
-		return fmt.Errorf("error parsing deployment: %s", err)
+		return fmt.Errorf("domain: error parsing deployment: %s", err)
 	}
 	for _, v := range h.defaultChatIDs {
 		if err := h.baseBot.SendDeploymentEvent(e, v); err != nil {
-			return fmt.Errorf("error sending deployment to chat %v: %s", v, err)
+			return fmt.Errorf("domain: error sending deployment to chat %v: %s", v, err)
 		}
 	}
 	return nil

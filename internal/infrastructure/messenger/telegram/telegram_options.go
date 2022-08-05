@@ -4,16 +4,20 @@ import (
 	"errors"
 )
 
-type TelegramOptions struct {
-	Token string
+type telegramOptions struct {
+	token string
 }
 
-func NewTelegramOptions(opts map[string]interface{}) (*TelegramOptions, error) {
+func newTelegramOptions(opts map[string]interface{}) (*telegramOptions, error) {
 	token, ok := opts["token"]
 	if !ok {
-		return nil, errors.New("telegram token is not present")
+		return nil, errors.New("token is not present")
 	}
-	return &TelegramOptions{
-		Token: token.(string),
+	t, ok := token.(string)
+	if !ok {
+		return nil, errors.New("token string type assertion failed")
+	}
+	return &telegramOptions{
+		token: t,
 	}, nil
 }

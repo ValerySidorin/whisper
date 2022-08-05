@@ -2,22 +2,30 @@ package gorm
 
 import "errors"
 
-type GormOptions struct {
-	Driver string
-	Dsn    string
+type gormOptions struct {
+	driver string
+	dsn    string
 }
 
-func NewGormOptions(opts map[string]interface{}) (*GormOptions, error) {
+func newGormOptions(opts map[string]interface{}) (*gormOptions, error) {
 	driver, ok := opts["driver"]
 	if !ok {
-		return nil, errors.New("gorm driver is not present")
+		return nil, errors.New("driver is not present")
 	}
 	dsn, ok := opts["dsn"]
 	if !ok {
 		return nil, errors.New("dsn string is not present")
 	}
-	return &GormOptions{
-		Driver: driver.(string),
-		Dsn:    dsn.(string),
+	dr, ok := driver.(string)
+	if !ok {
+		return nil, errors.New("driver string type assertion failed")
+	}
+	d, ok := dsn.(string)
+	if !ok {
+		return nil, errors.New("dsn string type assertion failed")
+	}
+	return &gormOptions{
+		driver: dr,
+		dsn:    d,
 	}, nil
 }

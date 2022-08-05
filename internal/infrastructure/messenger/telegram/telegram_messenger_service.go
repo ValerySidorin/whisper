@@ -1,6 +1,8 @@
 package telegram
 
 import (
+	"fmt"
+
 	"github.com/ValerySidorin/whisper/internal/domain"
 	"github.com/ValerySidorin/whisper/internal/domain/dto"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
@@ -14,13 +16,13 @@ type TelegramMessenger struct {
 }
 
 func Register(cfg *config.Configuration, r port.MessageRenderer, storage port.Storager) (*TelegramMessenger, error) {
-	opts, err := NewTelegramOptions(cfg.Messenger.Options)
+	opts, err := newTelegramOptions(cfg.Messenger.Options)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("telegram: malformed options: %s", err)
 	}
-	bot, err := tgbotapi.NewBotAPI(opts.Token)
+	bot, err := tgbotapi.NewBotAPI(opts.token)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("telegram: failed to create bot: %s", err)
 	}
 	m := &TelegramMessenger{
 		bot: bot,
@@ -34,7 +36,7 @@ func (te *TelegramMessenger) SendMessage(chatID int64, msg string) error {
 	m := tgbotapi.NewMessage(int64(chatID), msg)
 	_, err := te.bot.Send(m)
 	if err != nil {
-		return err
+		return fmt.Errorf("telegram: failed send message: %s", err)
 	}
 	return nil
 }
