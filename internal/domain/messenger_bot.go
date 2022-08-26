@@ -44,6 +44,16 @@ func (bot *DefaultMessengerBot) SendDeploymentEvent(de *vcsdto.DeploymentEvent, 
 	return nil
 }
 
+func (bot *DefaultMessengerBot) SendBuildEvent(be *vcsdto.BuildEvent, chatID int64) error {
+	msg := bot.renderer.RenderBuildEvent(be)
+	if msg != "" {
+		if err := bot.messenger.SendMessage(chatID, msg); err != nil {
+			return nil
+		}
+	}
+	return nil
+}
+
 func (bot *DefaultMessengerBot) HandleMessage(msg string, userID int64, vcs dto.VCSHostingType) {
 	m := bot.messenger.GetMessengerType()
 	if reflect.TypeOf(msg).Kind() == reflect.String && msg != "" {

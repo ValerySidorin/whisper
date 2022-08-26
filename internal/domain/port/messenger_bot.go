@@ -8,5 +8,6 @@ import (
 type MessengerBot interface {
 	SendMergeRequestEvent(mre *vcsdto.MergeRequestEvent, chatID int64) error
 	SendDeploymentEvent(de *vcsdto.DeploymentEvent, chatID int64) error
+	SendBuildEvent(be *vcsdto.BuildEvent, chatID int64) error
 	HandleMessage(msg string, userID int64, vcs dto.VCSHostingType)
 }

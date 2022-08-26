@@ -35,6 +35,13 @@ func (h *Handler) DeploymentHandlerFunc(ctx *fasthttp.RequestCtx) {
 	ctx.Response.SetStatusCode(http.StatusOK)
 }
 
+func (h *Handler) BuildHandlerFunc(ctx *fasthttp.RequestCtx) {
+	if err := h.eventHandler.HandleBuild(ctx.Request.Body()); err != nil {
+		h.processError(ctx, err)
+	}
+	ctx.Response.SetStatusCode(http.StatusOK)
+}
+
 func (h *Handler) processError(ctx *fasthttp.RequestCtx, err error) {
 	fmt.Println(err)
 	apiErr, ok := err.(port.HttpError)

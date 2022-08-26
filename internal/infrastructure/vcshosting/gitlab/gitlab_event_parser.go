@@ -60,3 +60,20 @@ func (p *GitlabEventParser) ParseDeploymentEvent(body []byte) (*dto.DeploymentEv
 	}
 	return m, nil
 }
+
+func (p *GitlabEventParser) ParseBuildEvent(body []byte) (*dto.BuildEvent, error) {
+	gb := gitlab.BuildEvent{}
+	if err := json.Unmarshal(body, &gb); err != nil {
+		return nil, errors.New("gitlab: build event unmarshalling error")
+	}
+	pr, _, err := p.client.Projects.GetProject(gb.ProjectID, nil)
+	if err != nil {
+		return nil, fmt.Errorf("gitlab: get project error: %s", err)
+	}
+	conv := conv.BuildEventConverter{BuildEvent: &gb, Project: pr}
+	m, ok := conv.Convert().(*dto.BuildEvent)
+	if !ok {
+		return nil, errors.New("gitlab: BuildEvent type assertion failed")
+	}
+	return m, nil
+}

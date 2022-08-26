@@ -2,6 +2,7 @@ package emsoft
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 
 	dto "github.com/ValerySidorin/whisper/internal/domain/dto/vcshosting"
@@ -44,6 +45,17 @@ func (r *EmsoftMessageRenderer) RenderDeploymentEvent(de *dto.DeploymentEvent) s
 		return "Deployment succeded! | " + de.Deployment.Project.Name + "\n-- -- -- --\nEnv: " + de.Deployment.Environment + "\n-- -- -- --\nJob: " + de.Deployment.Job.Name + "\n-- -- -- --\nCommit: " + de.Deployment.CommitTitle + "\n" + de.Deployment.CommitURL + "\n-- -- -- --\nInitiator: " + de.Deployment.User.Name
 	case "failed":
 		return "Deployment failed! | " + de.Deployment.Project.Name + "\n-- -- -- --\nEnv: " + de.Deployment.Environment + "\n-- -- -- --\nJob: " + de.Deployment.Job.Name + "\n" + de.Deployment.DeployableURL
+	default:
+		return ""
+	}
+}
+
+func (r *EmsoftMessageRenderer) RenderBuildEvent(be *dto.BuildEvent) string {
+	switch be.Build.Status {
+	case "success":
+		return "Build succeded! | " + be.Build.Project.Name + "\n-- -- -- --\nName: " + be.Build.Name + "\n-- -- -- --\nStage: " + be.Build.Stage + "\n-- -- -- --\nDuration: " + strconv.FormatFloat(be.Build.Duration, 'E', -1, 32) + "\n-- -- -- --\nInitiator: " + be.Build.User.Name
+	case "failed":
+		return "Build failed! | " + be.Build.Project.Name + "\n-- -- -- --\nName: " + be.Build.Name + "\n-- -- -- --\nStage: " + be.Build.Stage + "\n-- -- -- --\nDuration: " + strconv.FormatFloat(be.Build.Duration, 'E', -1, 32) + "\n-- -- -- --\nInitiator: " + be.Build.User.Name
 	default:
 		return ""
 	}
