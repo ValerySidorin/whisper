@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/domain/port"
+	"github.com/ValerySidorin/whisper/internal/infrastructure/config"
 	"github.com/ValerySidorin/whisper/internal/infrastructure/web/handler"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
@@ -21,6 +21,8 @@ func Register(cfg *config.Configuration, b port.MessengerBot, p port.EventParser
 			r.POST(v.Route, h.MergeRequestHandlerFunc)
 		case "deployment":
 			r.POST(v.Route, h.DeploymentHandlerFunc)
+		case "build":
+			r.POST(v.Route, h.BuildHandlerFunc)
 		default:
 			r.POST(v.Route, DefaultHandlerFunc)
 		}

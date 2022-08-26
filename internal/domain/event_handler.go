@@ -74,3 +74,20 @@ func (h *EventHandler) HandleDeployment(body []byte) error {
 	}
 	return nil
 }
+
+func (h *EventHandler) HandleBuild(body []byte) error {
+	e, err := h.eventParser.ParseBuildEvent(body)
+	if err != nil {
+		return fmt.Errorf("domain: error parsing build: %s", err)
+	}
+	user, _ := h.storage.GetUserByVCSHosting(h.vcsType, h.messengerType, e.Build.User.ID)
+	if err := h.baseBot.SendBuildEvent(e, user.MessengerUserID); err != nil {
+		return fmt.Errorf("domain: error sending build to chat %v: %s", user.MessengerUserID, err)
+	}
+	for _, v := range h.defaultChatIDs {
+		if err := h.baseBot.SendBuildEvent(e, v); err != nil {
+			return fmt.Errorf("domain: error sending build to chat %v: %s", v, err)
+		}
+	}
+	return nil
+}
